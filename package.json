@@ -1,0 +1,29 @@
+{
+  "name": "escalas",
+  "version": "1.0.0",
+  "description": "Escalas",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danigb/escalas.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "vows test/*.js"
+  },
+  "author": "= <=>",
+  "license": "MIT",
+  "keywords": [
+    "music",
+    "theory",
+    "scales",
+    "midi"
+  ],
+  "devDependencies": {},
+  "dependencies": {
+    "note-pitch": "^0.6.0"
+  },
+  "bugs": {
+    "url": "https://github.com/danigb/escalas/issues"
+  },
+  "homepage": "https://github.com/danigb/escalas",
+}
