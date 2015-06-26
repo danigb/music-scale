@@ -18,12 +18,13 @@
     "scales",
     "midi"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "vows": "^0.8.1"
+  },
   "dependencies": {
-    "note-pitch": "^0.6.0"
   },
   "bugs": {
     "url": "https://github.com/danigb/escalas/issues"
   },
-  "homepage": "https://github.com/danigb/escalas",
+  "homepage": "https://github.com/danigb/escalas"
 }
