@@ -12,7 +12,7 @@ minor.intervals(); // => ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7']
 
 ## Usage
 
-### Installation
+#### Installation
 
 Install with npm: `npm i music-scale` and require it:
 
@@ -20,9 +20,9 @@ Install with npm: `npm i music-scale` and require it:
 var Scale = require('music-scale')
 ```
 
-### Create scales
+#### Create scales
 
-You can create scales with a binary string or its decimal equivalent (ready theory below):
+You can create scales with a binary string or its decimal equivalent (read theory below):
 
 ```
 var major = new Scale('101011010101')
@@ -31,7 +31,7 @@ major = new Scale(2772) // the same scale
 major.binary // => '101011010101'
 ```
 
-### Scale intervals
+#### Scale intervals
 
 All scales have a `intervals()` method that returns an array of intervals.
 
@@ -47,7 +47,7 @@ var Note = require('note-pitch')
 Note.transpose('C', major.intervals()) //=> ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4']
 ```
 
-### Modes
+#### Modes
 
 ```
 var major = new Scale(2772)
@@ -55,14 +55,14 @@ dorian = major.rotate(1)
 mixolydian = major.rotate(4)
 ```
 
-### Coscale relationship
+#### Coscale relationship
 
 ```
 var majorPentatonic = new Scale(2772).coscale()
 majorPentatonic.binary // => '101001010100'
 ```
 
-### Scale reflection
+#### Scale reflection
 
 ```
 var major = new Scale(2772)
