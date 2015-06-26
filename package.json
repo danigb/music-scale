@@ -1,30 +1,31 @@
 {
-  "name": "escalas",
-  "version": "1.0.0",
-  "description": "Escalas",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/danigb/escalas.git"
-  },
+  "name": "music-scale",
+  "version": "0.1.0",
+  "description": "Music scales implemented with binary numbers",
   "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "vows test/*.js"
   },
-  "author": "= <=>",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danigb/music-scale.git"
+  },
   "keywords": [
     "music",
+    "scale",
     "theory",
-    "scales",
     "midi"
   ],
-  "devDependencies": {
-    "vows": "^0.8.1"
-  },
-  "dependencies": {
-  },
+  "author": "danigb <danigb@gmail.com>",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/danigb/escalas/issues"
+    "url": "https://github.com/danigb/music-scale/issues"
   },
-  "homepage": "https://github.com/danigb/escalas"
+  "homepage": "https://github.com/danigb/music-scale#readme",
+  "dependencies": {
+    "vows": "^0.8.1"
+  }
 }
