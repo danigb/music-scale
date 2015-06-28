@@ -4,10 +4,8 @@ Scales implemented using binary numbers. Inspired by [Rich Cochrane](http://coch
 
 ```
 var Scale = require('music-scale');
-var major = new Scale(2773);
+var major = new Scale('major');
 major.intervals(); // => ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7']
-var minor = new Scale('101101011010');
-minor.intervals(); // => ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7']
 ```
 
 ## Usage
@@ -22,14 +20,18 @@ var Scale = require('music-scale')
 
 #### Create scales
 
-You can create scales with a binary string or its decimal equivalent (read theory below):
+You can create scales with a name, a binary string or its decimal equivalent (read theory below). So, these all produces a major scale:
 
 ```
-var major = new Scale('101011010101')
-major.binary // => '101011010101'
-major = new Scale(2772) // the same scale
-major.binary // => '101011010101'
+// Al are the same scale
+var s1 = new Scale('major')
+new Scale('101011010101')
+new Scale(2772)
 ```
+
+#### Scale names
+
+Just 3 ('major', 'minor melodic', 'minor harminic'). A bigger dictionary is in process.
 
 #### Scale intervals
 

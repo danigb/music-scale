@@ -1,18 +1,46 @@
 
 module.exports = Scale
 
-function Scale (number) {
-  if (!(this instanceof Scale)) return new Scale(number)
+function Scale (name) {
+  if (!(this instanceof Scale)) return new Scale(name)
 
-  if (/^\d+$/.test(number)) {
-    this.binary = number.toString(2)
+  if (/^[01]+$/.test(name)) {
+    this.binary = name
+    this.decimal = parseInt(name, 2)
+  } else if (/^\d+$/.test(name)) {
+    this.decimal = +name
+    this.binary = this.decimal.toString(2)
   } else {
-    this.binary = number
+    this._name = name
+    this.decimal = Scale.byName[name]
+    if (!this.decimal) throw Error('Scale not found: "' + name + '"')
+    this.binary = this.decimal.toString(2)
   }
 
-  if (!/^1[01]*$/.test(this.binary)) {
-    throw Error('Wrong scale number: ' + number + ' (' + this.binary + ')')
+  if (this.binary.charAt(0) !== '1') {
+    throw Error('Wrong binary number: ' + this.binary + ' (' + name + ')')
   }
+}
+
+Scale.names = {
+  2773: ['major'],
+  2901: ['minor melodic', 'melodic'],
+  2905: ['minor harmonic', 'harmonic']
+}
+
+Scale.byName = {}
+Object.keys(Scale.names).forEach(function (scale) {
+  Scale.names[scale].forEach(function (name) {
+    Scale.byName[name] = +scale
+  })
+})
+
+Scale.prototype.name = function () {
+  if (!this._name) {
+    var names = Scale.names[this.decimal]
+    this._name = names ? names[0] : ''
+  }
+  return this._name
 }
 
 var INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
