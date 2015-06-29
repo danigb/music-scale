@@ -58,12 +58,5 @@ vows.describe('Binary Scales').addBatch({
   'reflection': function () {
     var major = new Scale(2773)
     assert.equal(major.reflection().binary, '101010110101')
-  },
-
-  'intervals': {
-    'major': function () {
-      var s = new Scale(2773)
-      assert.deepEqual(s.intervals(), ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7'])
-    }
   }
 }).export(module)

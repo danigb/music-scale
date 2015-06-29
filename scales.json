@@ -52,6 +52,9 @@
   "2466": [
     "super locrian pentatonic"
   ],
+  "2485": [
+    "lydian #2"
+  ],
   "2486": [
     "hungarian major"
   ],
@@ -223,8 +226,8 @@
     "gypsy"
   ],
   "3290": [
-    "spanish",
-    "phrygian major"
+    "phrygian major",
+    "spanish"
   ],
   "3302": [
     "oriental"
@@ -256,6 +259,9 @@
     "phrygian",
     "neopolitan minor"
   ],
+  "3430": [
+    "locrian 6"
+  ],
   "3434": [
     "locrian"
   ],
@@ -267,6 +273,9 @@
     "super locrian",
     "diminished whole tone",
     "pomeroy"
+  ],
+  "3500": [
+    "super locrian bb7"
   ],
   "3506": [
     "flamenco"
