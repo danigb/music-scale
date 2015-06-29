@@ -30,13 +30,24 @@ Scale.prototype.name = function () {
   return this._name
 }
 
-var INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
 Scale.prototype.intervals = function () {
-  this._intervals = this._intervals || this.binary.split('').reduce(function (intervals, val, index) {
-    if (val === '1') intervals.push(INTERVALS[index])
-    return intervals
-  }, [])
+  this._intervals = this._intervals || buildIntervals(this.binary)
   return this._intervals
+}
+
+var INTERVALS = [['P1'], ['m2'], ['M2', 'A2'], ['m3'], ['M3'], ['P4'],
+  ['d5', 'A4'], ['P5'], ['m6', 'A5'], ['M6'], ['m7', 'A6'], ['M7']]
+function buildIntervals (binary) {
+  var intervals = []
+  var name
+  for (var i = binary.length - 1; i > -1; i++) {
+    name = INTERVALS[i]
+    intervals.unshift(name[0])
+  }
+  if (binary.charAt(7) === '1' && binary.charAt(6) === '1') {
+    intervals[intervals.indexOf('d5')] = 'A4'
+  }
+  return intervals
 }
 
 Scale.prototype.modes = function () {
