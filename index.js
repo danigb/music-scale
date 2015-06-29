@@ -39,14 +39,14 @@ Scale.prototype.intervals = function () {
   return this._intervals
 }
 
-Scale.prototype.rotations = function () {
-  this._rotations = this._rotations || buildRotations(this.binary.split(''))
-  return this._rotations
+Scale.prototype.modes = function () {
+  this._modes = this._modes || buildmodes(this.binary.split(''))
+  return this._modes
 }
 
-Scale.prototype.rotate = function (num) {
-  var count = this.rotations().length
-  return new Scale(this.rotations()[num % count])
+Scale.prototype.mode = function (num) {
+  var count = this.modes().length
+  return new Scale(this.modes()[(num - 1) % count])
 }
 
 Scale.prototype.reflection = function () {
@@ -63,12 +63,12 @@ Scale.prototype.coscale = function () {
   throw Error('Something went wrong')
 }
 
-function buildRotations (array) {
-  var rotations = []
+function buildmodes (array) {
+  var modes = []
   for (var i = 0, len = array.length; i < len; i++) {
-    rotations.push(rotate(array, i, len).join(''))
+    modes.push(rotate(array, i, len).join(''))
   }
-  return rotations.filter(function (binary) {
+  return modes.filter(function (binary) {
     return binary.charAt(0) === '1'
   })
 }

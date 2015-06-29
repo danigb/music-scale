@@ -20,11 +20,10 @@ var Scale = require('music-scale')
 
 #### Create scales
 
-You can create scales with a name, a binary string or its decimal equivalent (read theory below). So, these all produces a major scale:
+You can create scales with a name, a binary string or its decimal equivalent (read the theory below). To create a major scale:
 
 ```
-// Al are the same scale
-var s1 = new Scale('major')
+new Scale('major')
 new Scale('101011010101')
 new Scale(2772)
 ```
@@ -52,9 +51,10 @@ Note.transpose('C', major.intervals()) //=> ['c4', 'd4', 'e4', 'f4', 'g4', 'a4',
 #### Modes
 
 ```
-var major = new Scale(2772)
-dorian = major.rotate(1)
-mixolydian = major.rotate(4)
+major = new Scale(2772)
+ionian = major.mode(1) // same scale
+dorian = major.mode(2)
+mixolydian = major.mode(5)
 ```
 
 #### Coscale relationship
@@ -88,7 +88,7 @@ The major scale is `1 0 1 0 1 1 0 1 0 1 0 1`. This number (2773 in decimal, see 
 
 ### Scale modes
 
-Note that modes of a scale are obtained by the technique known as 'bit rotation'. We would normallu eliminate all those rows that begin with a zero, since they don't contain a root note:
+Note that modes of a scale are obtained by the technique known as 'bit rotation'. We would normally eliminate all those rows that begin with a zero, since they don't contain a root note:
 
 ```
 101011010101 // ionian

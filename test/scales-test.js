@@ -24,6 +24,5 @@ vows.describe('Scale names').addBatch({
       assert.equal(s.binary, '101101011001')
       assert.equal(s.name(), 'harmonic')
     }
-  },
-  ''
+  }
 }).export(module)
