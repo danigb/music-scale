@@ -2,6 +2,8 @@ var vows = require('vows')
 var assert = require('assert')
 var Scale = require('../')
 
+Scale.use(Scale.basicNames)
+
 vows.describe('Scale names').addBatch({
   'create scales': {
     'major': function () {
@@ -26,8 +28,8 @@ vows.describe('Scale names').addBatch({
   'name method': {
     'name present': function () {
       assert.equal(Scale(2773).name(), 'major')
-      assert.equal(Scale(2901).name(), 'minor melodic')
-      assert.equal(Scale(2905).name(), 'minor harmonic')
+      assert.equal(Scale(2901).name(), 'melodic minor')
+      assert.equal(Scale(2905).name(), 'harmonic minor')
     },
     'name unknown': function () {
       assert.equal(Scale(2).name(), '')

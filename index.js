@@ -22,19 +22,6 @@ function Scale (name) {
   }
 }
 
-Scale.names = {
-  2773: ['major'],
-  2901: ['minor melodic', 'melodic'],
-  2905: ['minor harmonic', 'harmonic']
-}
-
-Scale.byName = {}
-Object.keys(Scale.names).forEach(function (scale) {
-  Scale.names[scale].forEach(function (name) {
-    Scale.byName[name] = +scale
-  })
-})
-
 Scale.prototype.name = function () {
   if (!this._name) {
     var names = Scale.names[this.decimal]
@@ -90,3 +77,19 @@ function rotate (array, num, len) {
   len = len || array.length
   return array.slice(num, len).concat(array.slice(0, num))
 }
+
+Scale.use = function (names) {
+  Scale.byName = {}
+  Scale.names = names
+  Object.keys(names).forEach(function (scale) {
+    names[scale].forEach(function (name) {
+      Scale.byName[name] = +scale
+    })
+  })
+}
+Scale.basicNames = {
+  '2773': ['major'],
+  '2901': ['melodic minor', 'melodic'],
+  '2905': ['harmonic minor', 'harmonic']
+}
+Scale.use(Scale.basicNames)

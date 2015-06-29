@@ -153,13 +153,15 @@
     "minor hexatonic"
   ],
   "2901": [
-    "melodic minor"
+    "melodic minor",
+    "melodic"
   ],
   "2902": [
     "dorian"
   ],
   "2905": [
-    "harmonic minor"
+    "harmonic minor",
+    "harmonic"
   ],
   "2906": [
     "aeolian"
