@@ -1,6 +1,15 @@
 # music-scale
 
-Scales implemented using binary numbers. Inspired by [Rich Cochrane](http://cochranemusic.com) and Phil O'Donnell
+The aim of this library is to give programmatically access to all the possible
+scales in western music.
+
+Sources of knowledge:
+- [LucyTune scales](http://www.lucytune.com/scales/)
+- [Walter Zettel blog](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html)
+- [allthescales.org](http://www.allthescales.org/)
+- [Quora: How many music scales are there?](http://www.quora.com/How-many-music-scales-are-there)
+
+Library usage example:
 
 ```
 var Scale = require('music-scale');
@@ -8,11 +17,14 @@ var major = new Scale('major');
 major.intervals(); // => ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7']
 ```
 
+`music-scales` is implemented using binary numbers. Inspired by [Rich Cochrane](http://cochranemusic.com) and Phil O'Donnell
+
+
 ## Usage
 
 #### Installation
 
-Install with npm: `npm i music-scale` and require it:
+Install with npm: `npm install music-scale` and require it:
 
 ```
 var Scale = require('music-scale')
