@@ -8,7 +8,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "vows test/*.js"
+    "test": "vows test/*.js",
+    "start": "webpack-dev-server --hot --progress --colors",
+    "build": "webpack --progress --colors"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,17 @@
   "homepage": "https://github.com/danigb/music-scale#readme",
   "dev-dependencies": {
     "vows": "^0.8.1"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "babel-core": "^5.6.15",
+    "babel-loader": "^5.2.2",
+    "node-libs-browser": "^0.5.2",
+    "react": "^0.13.3",
+    "react-hot-loader": "^1.2.7",
+    "react-router": "^0.13.3",
+    "webpack": "^1.10.0",
+    "webpack-dev-server": "^1.10.1"
   }
 }
