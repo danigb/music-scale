@@ -2,7 +2,7 @@ var vows = require('vows')
 var assert = require('assert')
 var Scale = require('../')
 
-Scale.use(require('../lib/scales.json'))
+Scale.use(require('../scales.json'))
 
 vows.describe('Scale names').addBatch({
   'basic scales': {
