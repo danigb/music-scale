@@ -35,19 +35,25 @@ Scale.prototype.intervals = function () {
   return this._intervals
 }
 
-var INTERVALS = [['P1'], ['m2'], ['M2', 'A2'], ['m3'], ['M3'], ['P4'],
-  ['d5', 'A4'], ['P5'], ['m6', 'A5'], ['M6'], ['m7', 'A6'], ['M7']]
+var INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4',
+  'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
 function buildIntervals (binary) {
-  var intervals = []
-  var name
-  for (var i = binary.length - 1; i > -1; i++) {
-    name = INTERVALS[i]
-    intervals.unshift(name[0])
+  var intervals = binary.split('').map(function (digit, index) {
+    return digit === '1' ? INTERVALS[index] : null
+  })
+  specialCase(intervals, 8, 'm6', 9, 'M6', 'A5')
+  specialCase(intervals, 6, 'd5', 7, 'P5', 'A4')
+  specialCase(intervals, 6, 'd5', 8, 'A5', 'A4')
+  //specialCase(intervals, 6, 'd5', 8, 'm6', 'A4', 'A5')
+  return intervals.filter(function (i) { return i })
+}
+
+function specialCase (intervals, a, aVal, b, bVal, aSus, bSus) {
+  if (intervals[a] === aVal && intervals[b] === bVal) {
+    console.log('special', intervals, a, b, aSus, bSus)
+    if (aSus) intervals[a] = aSus
+    if (bSus) intervals[b] = bSus
   }
-  if (binary.charAt(7) === '1' && binary.charAt(6) === '1') {
-    intervals[intervals.indexOf('d5')] = 'A4'
-  }
-  return intervals
 }
 
 Scale.prototype.modes = function () {
