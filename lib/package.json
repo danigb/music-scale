@@ -1,15 +1,8 @@
 {
   "name": "music-scale",
-  "version": "0.0.0",
-  "private": "true",
-  "description": "music-scale test and scale encyclopedia app",
-  "main": "lib/index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "vows test/*.js"
-  },
+  "version": "0.2.0",
+  "description": "Music scales implemented with binary numbers",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danigb/music-scale.git"
@@ -25,8 +18,5 @@
   "bugs": {
     "url": "https://github.com/danigb/music-scale/issues"
   },
-  "homepage": "https://github.com/danigb/music-scale#readme",
-  "dev-dependencies": {
-    "vows": "^0.8.1"
-  }
+  "homepage": "https://github.com/danigb/music-scale#readme"
 }
