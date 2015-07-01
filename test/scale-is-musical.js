@@ -5,12 +5,14 @@ var Scale = require('../')
 vows.describe('Scale steps').addBatch({
   'should have at least 3 notes': function () {
     assert(!new Scale('101000000000').isMusical())
-    assert(new Scale('101010000000').isMusical())
+    assert(new Scale('100010001000').isMusical())
     assert(new Scale('110110110110').isMusical())
   },
   'more than two consecutive semitones': function () {
     assert(!new Scale('111000000000').isMusical())
   },
   'interval larger than a major third and fewer than five notes': function () {
+    assert(new Scale('101000011010').isMusical())
+    assert(!new Scale('101000010010').isMusical())
   }
 }).export(module)

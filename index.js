@@ -45,9 +45,16 @@ function Scale (num, name) {
   }
 }
 
+/*
+ * Restrict scales to Cochrane definition:
+ * - scales of between 3 and 8 notes
+ * - don't have more than two consecutive semitones
+ * - don't have an interval larger than a major third and fewer than five notes
+ */
 Scale.prototype.isMusical = function () {
   return this.length > 2 && this.length < 9 &&
-    this.binary.match(/111/) === null
+    this.binary.match(/111/) === null &&
+    (this.length > 4 || this.binary.match(/0000/) === null)
 }
 
 Scale.prototype.steps = memoize('steps', function () {
