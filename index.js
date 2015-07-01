@@ -1,6 +1,8 @@
 
 module.exports = Scale
 
+var EMPTY_ARRAY = []
+
 function Scale (name) {
   if (!(this instanceof Scale)) return new Scale(name)
 
@@ -16,10 +18,16 @@ function Scale (name) {
     if (!this.decimal) throw Error('Scale not found: "' + name + '"')
     this.binary = this.decimal.toString(2)
   }
+  this.length = (this.binary.match(/1/g) || EMPTY_ARRAY).length
 
   if (this.binary.charAt(0) !== '1') {
     throw Error('Wrong binary number: ' + this.binary + ' (' + name + ')')
   }
+}
+
+
+Scale.prototype.valid = function () {
+  return this.length > 2 && this.length < 9
 }
 
 Scale.prototype.name = function () {
