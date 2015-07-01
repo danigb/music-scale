@@ -42,7 +42,7 @@ vows.describe('Scale names').addBatch({
         'dorian #4', 'phrygian major', 'lydian #2', 'super locrian bb7'])
     }
   }
-}).export(module)
+}) // .export(module)
 
 function modeNames (s) {
   return s.modes().map(function (scale) { return new Scale(scale).name() })
