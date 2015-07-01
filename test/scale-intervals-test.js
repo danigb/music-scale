@@ -2,8 +2,6 @@ var vows = require('vows')
 var assert = require('assert')
 var Scale = require('../')
 
-Scale.use(require('../scales.json'))
-
 var tests = {}
 var all = require('./scale-intervals.json')
 Object.keys(all).forEach(function (name) {

@@ -28,7 +28,6 @@ function Scale (name) {
   }
 }
 
-
 Scale.prototype.isMusical = function () {
   return this.length > 2 && this.length < 9 &&
     this.binary.match(/111/) === null
@@ -62,6 +61,29 @@ function buildSteps (binary) {
   return steps
 }
 
+Scale.prototype.numbers = function () {
+  this._numbers = this._numbers || buildNumbers(this.binary)
+  return this._numbers
+}
+
+var NUMBERS = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7']
+function buildNumbers (binary) {
+  return binary.split('')
+    .map(function (digit, index) {
+      return digit === '1' ? NUMBERS[index] : null
+    })
+    .filter(function (n) { return n })
+}
+
+Scale.fromNumbers = function (array) {
+  var numbers = array.map(function (i) {
+    return i.toString()
+  })
+  return new Scale(NUMBERS.map(function (num) {
+    return numbers.indexOf(num) >= 0 ? '1' : '0'
+  }).join(''))
+}
+
 Scale.prototype.intervals = function () {
   this._intervals = this._intervals || buildIntervals(this.binary)
   return this._intervals
@@ -88,7 +110,7 @@ function specialCase (intervals, a, aVal, b, bVal, aSus, bSus) {
 }
 
 Scale.prototype.modes = function () {
-  this._modes = this._modes || buildmodes(this.binary.split(''))
+  this._modes = this._modes || buildModes(this.binary.split(''))
   return this._modes
 }
 
@@ -111,7 +133,7 @@ Scale.prototype.coscale = function () {
   throw Error('Something went wrong')
 }
 
-function buildmodes (array) {
+function buildModes (array) {
   var modes = []
   for (var i = 0, len = array.length; i < len; i++) {
     modes.push(rotate(array, i, len).join(''))
@@ -126,18 +148,39 @@ function rotate (array, num, len) {
   return array.slice(num, len).concat(array.slice(0, num))
 }
 
-Scale.use = function (names) {
-  Scale.byName = {}
-  Scale.names = names
-  Object.keys(names).forEach(function (scale) {
-    names[scale].forEach(function (name) {
-      Scale.byName[name] = +scale
+Scale.byName = {}
+Scale.names = {}
+Scale.addNames = function (names) {
+  Object.keys(names).forEach(function (decimal) {
+    var modes = buildModes(parseInt(decimal, 10).toString(2).split(''))
+    var modeNames = names[decimal]
+    modes.forEach(function (mode, index) {
+      var modeDecimal = parseInt(mode, 2)
+      var names = modeNames[index] || modeNames[0].map(function (n) {
+        return n + ' mode ' + (index + 1)
+      })
+      Scale.names[modeDecimal] = names
+      names.forEach(function (name) {
+        Scale.byName[name] = modeDecimal
+      })
     })
   })
 }
-Scale.basicNames = {
-  '2773': ['major'],
-  '2901': ['melodic minor', 'melodic'],
-  '2905': ['harmonic minor', 'harmonic']
-}
-Scale.use(Scale.basicNames)
+Scale.commonScales = [2708, 2418, 2514, 2387, 2773, 2901, 2905]
+
+Scale.addNames({
+  '2708': [['major pentatonic'], ['dorian pentatonic'], ['phrygian pentatonic'],
+    ['mixolydian pentatonic'], ['minor pentatonic']],
+  '2418': [['first blues', 'minor blues']],
+  '2514': [['second blues']],
+  '2387': [['third blues']],
+  '2773': [['major', 'ionian'], ['dorian'], ['phrygian'], ['lydian'],
+    ['mixolydian', 'dominant'], ['aeolian'], ['locrian']],
+  '2901': [['melodic minor', 'melodic'], ['melodic minor second mode'],
+    ['lydian augmented'], ['lydian dominant', 'lydian b7'],
+    ['melodic minor fifth mode', 'hindu', 'mixolydian b6'],
+    ['locrian #2'], ['altered', 'super locrian', 'diminished whole tone']],
+  '2905': [['harmonic minor', 'harmonic'], ['locrian 6'], ['ionian augmented'],
+    ['dorian #4', 'romanian minor'], ['phrygian major', 'spanish'], ['lydian #2'],
+    ['super locrian bb7']]
+})

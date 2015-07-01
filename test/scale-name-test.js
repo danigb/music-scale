@@ -2,8 +2,6 @@ var vows = require('vows')
 var assert = require('assert')
 var Scale = require('../')
 
-Scale.use(Scale.basicNames)
-
 vows.describe('Scale names').addBatch({
   'create scales': {
     'major': function () {
