@@ -1,13 +1,6 @@
 # music-scale
 
-The aim of this library is to give programmatically access to all the possible
-scales in western music.
-
-Sources of knowledge:
-- [LucyTune scales](http://www.lucytune.com/scales/)
-- [Walter Zettel blog](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html)
-- [allthescales.org](http://www.allthescales.org/)
-- [Quora: How many music scales are there?](http://www.quora.com/How-many-music-scales-are-there)
+Create (western, well tempered) musical scales with javascript.
 
 Library usage example:
 

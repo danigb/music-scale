@@ -30,6 +30,26 @@ Scale.prototype.name = function () {
   return this._name
 }
 
+Scale.prototype.steps = function () {
+  this._steps = this._steps || buildSteps(this.binary)
+  return this._steps
+}
+
+function buildSteps (binary) {
+  var array = rotate(binary.split(''), 1)
+  var steps = []
+  var current = 1
+  array.forEach(function (digit, index) {
+    if (digit === '0') {
+      current++
+    } else {
+      steps.push(current)
+      current = 1
+    }
+  })
+  return steps
+}
+
 Scale.prototype.intervals = function () {
   this._intervals = this._intervals || buildIntervals(this.binary)
   return this._intervals
