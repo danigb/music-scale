@@ -4,17 +4,17 @@ var Scale = require('../')
 
 vows.describe('Scale modes').addBatch({
   'basic rotation': {
-    topic: function () { return new Scale('1100') },
+    topic: function () { return new Scale('110000000000') },
 
     'modes': function (s) {
-      var modes = new Scale('1100').modes()
+      var modes = s.modes()
       assert.equal(modes.length, 2)
-      assert.deepEqual(modes, ['1100', '1001'])
+      assert.deepEqual(modes, ['110000000000', '100000000001'])
     },
 
     'mode': function (s) {
-      assert.equal(s.mode(1).binary, '1100')
-      assert.equal(s.mode(2).binary, '1001')
+      assert.equal(s.mode(1).binary, '110000000000')
+      assert.equal(s.mode(2).binary, '100000000001')
     }
   },
 

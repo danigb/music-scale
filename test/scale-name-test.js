@@ -32,7 +32,7 @@ vows.describe('Scale names').addBatch({
       assert.equal(Scale(2905).name(), 'harmonic minor')
     },
     'name unknown': function () {
-      assert.equal(Scale(2).name(), '')
+      assert.equal(Scale('100000000001').name(), '')
     }
   }
 }).export(module)

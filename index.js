@@ -20,14 +20,18 @@ function Scale (name) {
   }
   this.length = (this.binary.match(/1/g) || EMPTY_ARRAY).length
 
+  if (this.binary.length !== 12) {
+    throw Error('Scale binary (' + this.binary + ') must have 12 digits: ' + this.binary.length)
+  }
   if (this.binary.charAt(0) !== '1') {
-    throw Error('Wrong binary number: ' + this.binary + ' (' + name + ')')
+    throw Error('Scale should have root: ' + this.binary + ' (' + name + ')')
   }
 }
 
 
-Scale.prototype.valid = function () {
-  return this.length > 2 && this.length < 9
+Scale.prototype.isMusical = function () {
+  return this.length > 2 && this.length < 9 &&
+    this.binary.match(/111/) === null
 }
 
 Scale.prototype.name = function () {
