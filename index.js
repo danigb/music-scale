@@ -2,8 +2,6 @@
 
 module.exports = Scale
 
-var EMPTY_ARRAY = []
-
 /*
  * rotates a string of 12 characters length (a scale binary number)
  */
@@ -34,7 +32,7 @@ function Scale (num, name) {
   } else {
     throw Error('Invalid scale number: ' + num)
   }
-  this.length = (this.binary.match(/1/g) || EMPTY_ARRAY).length
+  this.length = this.binary.match(/1/g).length
   if (name) this.name = name
 
   if (this.binary.length !== 12) {
@@ -45,6 +43,12 @@ function Scale (num, name) {
   }
 }
 
+var STEPS = /1(0)*/g
+Scale.prototype.steps = memoize('steps', function () {
+  return (this.binary.match(STEPS)).map(function (zeros) {
+    return zeros.length
+  })
+})
 
 /*
  * leap
@@ -55,26 +59,11 @@ function Scale (num, name) {
  *
  * @returns the maximum number of semitones between two notes of the scale
  */
-var CONSECUTIVE_ZEROS = /(0)\1*/g
 Scale.prototype.leap = function () {
-  return (this.binary.match(CONSECUTIVE_ZEROS) || EMPTY_ARRAY).reduce(function (num, zeros) {
+  return (this.binary.match(STEPS)).reduce(function (num, zeros) {
     return Math.max(num, zeros.length)
-  }, 0) + 1
+  }, 0)
 }
-
-Scale.prototype.steps = memoize('steps', function () {
-  var mode = rotate(this.binary, 1)
-  var steps = []
-  var current = 0
-  for (var i = 0; i < 12; i++) {
-    if (mode[i] === '0') current++
-    else {
-      steps.push(current + 1)
-      current = 0
-    }
-  }
-  return steps
-})
 
 var NUMBERS = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7']
 Scale.prototype.numbers = memoize('numbers', function () {
@@ -128,6 +117,14 @@ Scale.prototype.modes = memoize('modes', function () {
 Scale.prototype.mode = function (num) {
   var count = this.modes().length
   return new Scale(this.modes()[(num - 1) % count])
+}
+
+/*
+ */
+Scale.prototype.isModeOf = function (other) {
+  var binary = other.binary ? other.binary : other
+  return binary.length === this.binary.length &&
+    (binary + binary).indexOf(this.binary) !== -1
 }
 
 Scale.prototype.reflection = function () {

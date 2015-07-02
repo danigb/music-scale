@@ -18,6 +18,15 @@ vows.describe('Scale modes').addBatch({
     }
   },
 
+  'is mode of': function () {
+    var scale = new Scale(2773)
+    scale.modes().forEach(function (mode) {
+      assert.equal(scale.isModeOf(mode), true)
+    })
+    assert.equal(scale.isModeOf(new Scale(2902)), true) // dorian
+    assert.equal(scale.isModeOf(new Scale(2901)), false) // melodic minor
+  },
+
   'major scale modes': function () {
     var major = new Scale(2773)
     assert.equal(major.modes().length, 7)
