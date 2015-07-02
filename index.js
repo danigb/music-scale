@@ -34,16 +34,23 @@ function Scale (num, name) {
   } else {
     throw Error('Invalid scale number: ' + num)
   }
-  this.length = this.binary.match(/1/g).length
-  if (name) this.name = name
 
-  if (this.binary.length !== 12) {
-    throw Error('Scale binary (' + this.binary + ') must have 12 digits: ' + this.binary.length)
-  }
-  if (this.binary.charAt(0) !== '1') {
-    throw Error('Scale should have root: ' + this.binary + ' (' + num + ')')
+  this.length = this.binary.match(/1/g).length
+  this._names = Array.isArray(name) ? name : [ name ]
+
+  validate(this.binary, this.decimal)
+}
+
+function validate (binary, decimal) {
+  if (binary.length !== 12) {
+    throw Error('Scale binary (' + binary + ') must have 12 digits: ' + binary.length)
+  } else if (binary.charAt(0) !== '1') {
+    throw Error('Scale should have root: ' + binary + ' (' + decimal + ')')
   }
 }
+
+Scale.prototype.names = function () { return this._names }
+Scale.prototype.name = function () { return this._names[0] }
 
 /*
  * Steps: the number of semitones required for each degree (step)

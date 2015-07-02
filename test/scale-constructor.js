@@ -16,9 +16,19 @@ vows.describe('Binary Scales').addBatch({
       assert.throws(function () { return new Scale('010101000000') }, /root/)
     }
   },
-  'name': function () {
-    var s = new Scale(2773, 'major')
-    assert.equal(s.name, 'major')
+  'can give names to a scale': {
+    'no name': function () {
+      assert.equal(new Scale(2773).name(), null)
+    },
+    'single name': function () {
+      var s = new Scale(2773, 'major')
+      assert.equal(s.name(), 'major')
+    },
+    'multiple names': function () {
+      var s = new Scale(2773, ['ionian', 'major'])
+      assert.equal(s.name(), 'ionian')
+      assert.deepEqual(s.names(), ['ionian', 'major'])
+    }
   },
   'integer': function () {
     var s = new Scale(2773)
