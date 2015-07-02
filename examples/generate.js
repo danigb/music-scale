@@ -4,6 +4,10 @@ var Scale = require('../')
 var MIN = parseInt('100000000000', 2)
 var MAX = parseInt('111111111111', 2)
 
+Scale.all().filter(function (scale) {
+  return scale.leap() < 5 && scale.cannonicalMode() === scale
+})
+
 var groupedModes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map(function () { return [] })
 for (var i = MIN; i <= MAX; i++) {
   var binary = i.toString(2)

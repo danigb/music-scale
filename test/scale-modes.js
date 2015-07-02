@@ -1,12 +1,12 @@
 var vows = require('vows')
 var assert = require('assert')
-var Scale = require('../')
+var Scale = require('../common.js')
 
 function binaryOf (scale) { return scale.binary }
 
 vows.describe('Scale modes').addBatch({
   'basic rotation': {
-    topic: function () { return new Scale('110000000000') },
+    topic: function () { return Scale.get('110000000000') },
 
     'modes': function (s) {
       var modes = s.modes().map(binaryOf)
@@ -16,35 +16,35 @@ vows.describe('Scale modes').addBatch({
 
     'mode': function (s) {
       assert.equal(s.mode(1).binary, '110000000000')
+      assert(s.mode(1) === s, 'is the same!')
       assert.equal(s.mode(2).binary, '100000000001')
     }
   },
 
   'is mode of': function () {
-    var scale = new Scale(2773)
+    var scale = Scale.get('major')
     scale.modes().forEach(function (mode) {
       assert.equal(scale.isModeOf(mode), true)
     })
-    assert.equal(scale.isModeOf(new Scale(2902)), true) // dorian
-    assert.equal(scale.isModeOf(new Scale(2901)), false) // melodic minor
+    assert.equal(scale.isModeOf(Scale.get(2902)), true) // dorian
+    assert.equal(scale.isModeOf(Scale.get(2901)), false) // melodic minor
   },
 
   'cannonical mode': function () {
-    var scale = new Scale(2773)
+    var scale = Scale.get('major')
     assert.equal(scale.cannonicalMode().decimal, 2741) // lydian
   },
 
   'major scale modes': function () {
-    var modes = new Scale(2773).modes().map(binaryOf)
+    var s = Scale.get('major')
+    var modes = s.modes()
     assert.equal(modes.length, 7)
-    assert.deepEqual(modes, [
-      '101011010101', // ionian
-      '101101010110', // dorian
-      '110101011010', // phrygian
-      '101010110101', // lydian
-      '101011010110', // mixolydian
-      '101101011010', // aeolian
-      '110101101010'  // locrian
-    ])
+    assert.equal(modes[0].name(), 'major')
+    assert.equal(modes[1].name(), 'dorian')
+    assert.equal(modes[2].name(), 'phrygian')
+    assert.equal(modes[3].name(), 'lydian')
+    assert.equal(modes[4].name(), 'mixolydian')
+    assert.equal(modes[5].name(), 'aeolian')
+    assert.equal(modes[6].name(), 'locrian')
   }
 }).export(module)

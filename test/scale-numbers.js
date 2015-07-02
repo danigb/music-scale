@@ -11,7 +11,7 @@ vows.describe('Scale numbers').addBatch({
   },
   'scale numbers': {
     'major mode': function () {
-      var major = new Scale(2773)
+      var major = Scale.get(2773)
       assert.deepEqual(major.numbers(), ['1', '2', '3', '4', '5', '6', '7'])
     }
   }

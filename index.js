@@ -2,13 +2,12 @@
 
 module.exports = Scale
 
-function Scale (num, name) {
-  if (!(this instanceof Scale)) return new Scale(num)
+var IS_BINARY = /^[01]+$/
+var IS_NUMBER = /^\d+$/
+function Scale (num, names) {
+  if (!(this instanceof Scale)) return Scale.get(num)
 
-  if (/^[01]+$/.test(num)) {
-    this.binary = num
-    this.decimal = parseInt(num, 2)
-  } else if (/^\d+$/.test(num)) {
+  if (IS_NUMBER.test(num)) {
     this.decimal = +num
     this.binary = this.decimal.toString(2)
   } else {
@@ -20,19 +19,18 @@ function Scale (num, name) {
   }
 
   this.length = this.binary.match(/1/g).length
-  this._names = Array.isArray(name) ? name : [ name ]
+  if (names) this._names = names
 }
 
 Scale.MIN = parseInt('100000000000', 2)
 Scale.MAX = parseInt('111111111111', 2)
 
 Scale.get = function (identifier) {
-  Scale.cache(identifier, function () {
-    try {
-      return new Scale(identifier)
-    } catch(e) {
-      return Scale.get(Scale.Names.toNumber(identifier))
-    }
+  if (!identifier) return null
+  return Scale.cache(identifier, function () {
+    if (IS_BINARY.test(identifier)) return Scale.get(parseInt(identifier, 2))
+    else if (IS_NUMBER.test(identifier)) return new Scale(identifier)
+    return Scale.get(Scale.Names.toDecimal(identifier))
   })
 }
 
@@ -43,11 +41,11 @@ Scale.fromNumbers = function (array) {
   var binary = NUMBERS.map(function (num) {
     return numbers.indexOf(num) >= 0 ? '1' : '0'
   }).join('')
-  return new Scale(binary)
+  return Scale.get(binary)
 }
 
-Scale.prototype.names = function () { return this._names }
-Scale.prototype.name = function () { return this._names[0] }
+Scale.prototype.names = function () { return this._names || Scale.Names.fromDecimal(this.decimal) }
+Scale.prototype.name = function () { return this.names()[0] }
 
 /*
  * Steps: the number of semitones required for each degree (step)
@@ -61,9 +59,9 @@ Scale.prototype.name = function () { return this._names[0] }
  * @example Scale(2773).steps() // => [2, 2, 1, 2, 2, 2, 1]
  */
 var STEPS = /1(0)*/g
-Scale.prototype.steps = memoize('steps', function () {
+Scale.prototype.steps = function () {
   return (this.binary.match(STEPS)).map(lengthOf)
-})
+}
 
 /*
  * leap
@@ -81,17 +79,17 @@ Scale.prototype.leap = function () {
 }
 
 var NUMBERS = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7']
-Scale.prototype.numbers = memoize('numbers', function () {
+Scale.prototype.numbers = function () {
   return this.binary.split('')
     .map(function (digit, index) {
       return digit === '1' ? NUMBERS[index] : null
     })
     .filter(function (n) { return n })
-})
+}
 
 var INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4',
   'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
-Scale.prototype.intervals = memoize('intervals', function () {
+Scale.prototype.intervals = function () {
   var intervals = this.binary.split('').map(function (digit, index) {
     return digit === '1' ? INTERVALS[index] : null
   })
@@ -100,7 +98,7 @@ Scale.prototype.intervals = memoize('intervals', function () {
   specialCase(intervals, 6, 'd5', 8, 'A5', 'A4')
   // specialCase(intervals, 6, 'd5', 8, 'm6', 'A4', 'A5')
   return intervals.filter(function (i) { return i })
-})
+}
 
 function specialCase (intervals, a, aVal, b, bVal, aSus, bSus) {
   if (intervals[a] === aVal && intervals[b] === bVal) {
@@ -109,30 +107,31 @@ function specialCase (intervals, a, aVal, b, bVal, aSus, bSus) {
   }
 }
 
-Scale.prototype.modes = memoize('modes', function () {
+Scale.prototype.modes = function () {
   var modes = []
   for (var i = 0; i < 12; i++) {
     modes.push(rotate(this.binary, i))
   }
-  return modes.filter(function (binary) {
+  var m = modes.filter(function (binary) {
     return binary.charAt(0) === '1'
-  }).map(function (binary) {
-    return new Scale(binary)
+  }).map(function (binary, index) {
+    return Scale.get(binary)
   })
-})
+  return m
+}
 
-Scale.prototype.cannonicalMode = memoize('cannonical', function () {
+Scale.prototype.mode = function (num) {
+  var count = this.modes().length
+  return this.modes()[(num - 1) % count]
+}
+
+Scale.prototype.cannonicalMode = function () {
   var ordered = this.modes().sort(function (scaleA, scaleB) {
     var stepsA = +scaleA.steps().join('')
     var stepsB = +scaleB.steps().join('')
     return stepsA - stepsB
   })
   return ordered[ordered.length - 1]
-})
-
-Scale.prototype.mode = function (num) {
-  var count = this.modes().length
-  return this.modes()[(num - 1) % count]
 }
 
 /*
@@ -144,55 +143,52 @@ Scale.prototype.isModeOf = function (other) {
 }
 
 Scale.prototype.reflection = function () {
-  return new Scale(this.binary.split('').reverse().join(''))
+  return Scale.get(this.binary.split('').reverse().join(''))
 }
 
 Scale.prototype.coscale = function () {
   var inv = this.binary.replace(/0/g, 'L').replace(/1/g, '0').replace(/L/g, 1)
-  return new Scale(rotate(inv, inv.indexOf('1')))
+  return Scale.get(rotate(inv, inv.indexOf('1')))
 }
 
 Scale.cache = (function (values) {
   return function (id, generator) {
-    if (id) return values[id] || (values[id] = generator())
+    return values[id] || (values[id] = generator())
   }
 })({})
 
+/*
+ * Name store
+ *
+ * Add decimal and names and build an index to retrieve them from decimal to
+ * names and from name to decimal number
+ */
 Scale.Names = (function (decToNames, nameToDec) {
-  return {
-    fromDecimal: function (decimal) { return decToNames[decimal] || [] },
-    toDecimal: function (name) { return nameToDec[name] },
-    add: function (decimal, names) {
+  function store (hash) {
+    var names
+    Object.keys(hash).forEach(function (decimal) {
+      names = hash[decimal]
       decToNames[decimal] = names
       names.forEach(function (name) { nameToDec[name] = decimal })
-    }
+    })
   }
+  store.fromDecimal = function (decimal) { return decToNames[decimal] || [] }
+  store.toDecimal = function (name) { return nameToDec[name] }
+  return store
 })({}, {})
-Scale.Names.add('2773', ['major', 'ionian'])
-Scale.Names.add('2901', ['melodic minor', 'melodic'])
-Scale.Names.add('2905', ['harmonic minor', 'harmonic'])
-Scale.Names.add('2709', ['major pentatonic'])
+
+Scale.Names({
+  '2773': ['major'],
+  '2901': ['melodic minor', 'melodic'],
+  '2905': ['harmonic minor', 'harmonic'],
+  '2709': ['major pentatonic']
+})
 
 /*
  * rotates a string of 12 characters length (a scale binary number)
  */
 function rotate (str, positions) {
   return str.slice(positions, 12) + str.slice(0, positions)
-}
-
-/*
- * cache the return value inside the Object
- * only for no arguments functions
- */
-function memoize (name, func, setter) {
-  name = '__' + name
-  return function () {
-    if (setter && arguments.length === 1) {
-      this[name] = arguments[0]
-    } else {
-      return this[name] ? this[name] : this[name] = func.apply(this, arguments)
-    }
-  }
 }
 
 function lengthOf (o) { return o.length }

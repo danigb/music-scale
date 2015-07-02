@@ -4,7 +4,7 @@ var Scale = require('../')
 
 vows.describe('Scale coscale').addBatch({
   'coscale': function () {
-    var major = new Scale(2773)
+    var major = Scale.get('major')
     assert.equal(major.coscale().binary, '101001010100')
   }
 }).export(module)

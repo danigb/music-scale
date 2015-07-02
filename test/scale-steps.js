@@ -4,7 +4,7 @@ var Scale = require('../')
 
 vows.describe('Scale steps').addBatch({
   'get scale steps': function () {
-    var s = new Scale(2773)
+    var s = Scale.get('major')
     assert.deepEqual(s.steps(), [2, 2, 1, 2, 2, 2, 1])
   }
 }).export(module)

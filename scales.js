@@ -1,18 +1,19 @@
+var Scale = require('./')
 var Scales = {}
 Scales.byName = {}
 Scales.names = {}
 Scales.addNames = function (names) {
   Object.keys(names).forEach(function (decimal) {
-    var modes = buildModes(parseInt(decimal, 10).toString(2).split(''))
+    var scale = Scale.get(decimal)
+    var modes = scale.modes()
     var modeNames = names[decimal]
     modes.forEach(function (mode, index) {
-      var modeDecimal = parseInt(mode, 2)
       var names = modeNames[index] || modeNames[0].map(function (n) {
         return n + ' mode ' + (index + 1)
       })
-      Scales.names[modeDecimal] = names
+      Scales.names[mode.decimal] = names
       names.forEach(function (name) {
-        Scales.byName[name] = modeDecimal
+        Scales.byName[name] = mode.decimal
       })
     })
   })
@@ -35,3 +36,5 @@ Scales.addNames({
     ['dorian #4', 'romanian minor'], ['phrygian major', 'spanish'], ['lydian #2'],
     ['super locrian bb7']]
 })
+
+console.log(Scales.names)

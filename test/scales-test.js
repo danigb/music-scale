@@ -7,7 +7,7 @@ var NAMES = require('../scales.json')
 
 vows.describe('Scale names').addBatch({
   'basic scales': {
-    'ajor': function () {
+    'major': function () {
       var s = new Scale('major')
       assert.equal(s.decimal, 2773)
       assert.equal(s.binary, '101011010101')
