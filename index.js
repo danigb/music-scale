@@ -35,7 +35,7 @@ function Scale (num, name) {
     throw Error('Invalid scale number: ' + num)
   }
   this.length = (this.binary.match(/1/g) || EMPTY_ARRAY).length
-  this.name = name
+  if (name) this.name = name
 
   if (this.binary.length !== 12) {
     throw Error('Scale binary (' + this.binary + ') must have 12 digits: ' + this.binary.length)
@@ -45,16 +45,21 @@ function Scale (num, name) {
   }
 }
 
+
 /*
- * Restrict scales to Cochrane definition:
- * - scales of between 3 and 8 notes
- * - don't have more than two consecutive semitones
- * - don't have an interval larger than a major third and fewer than five notes
+ * leap
+ *
+ * Useful to limit the number of scales: "The requirement of no step greater
+ * than a major third is somewhat arbitrary, but does allow us to include
+ * commonly used scales like the Pentatonic" - William Zeitler
+ *
+ * @returns the maximum number of semitones between two notes of the scale
  */
-Scale.prototype.isMusical = function () {
-  return this.length > 2 && this.length < 9 &&
-    this.binary.match(/111/) === null &&
-    (this.length > 4 || this.binary.match(/0000/) === null)
+var CONSECUTIVE_ZEROS = /(0)\1*/g
+Scale.prototype.leap = function () {
+  return (this.binary.match(CONSECUTIVE_ZEROS) || EMPTY_ARRAY).reduce(function (num, zeros) {
+    return Math.max(num, zeros.length)
+  }, 0) + 1
 }
 
 Scale.prototype.steps = memoize('steps', function () {

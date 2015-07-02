@@ -9,7 +9,7 @@ function simple (scale) {
 }
 
 vows.describe('Triads tests').addBatch({
-  'major triad': function() {
+  'major triad': function () {
     var t = new Scale('100010010000')
     assert.deepEqual(simple(t), 'c e g')
     assert.deepEqual(t.modes().map(simple), ['c e g', 'c eb ab', 'c f a'])
