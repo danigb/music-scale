@@ -6,8 +6,9 @@ Library usage example:
 
 ```
 var Scale = require('music-scale');
-var major = new Scale(2773);
+var major = Scale.get('major');
 major.intervals(); // => ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7']
+major.mode(2).name(); // => 'dorian'
 ```
 
 `music-scale` is inspired by the works of [Rich Cochrane](http://cochranemusic.com), [Walter Zettel](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html) and [William Zeitler](http://www.allthescales.org/)
@@ -24,17 +25,45 @@ var Scale = require('music-scale')
 
 #### Create scales
 
-You can create scales with a name, a binary string or its decimal equivalent (read the theory below). To create a major scale:
+You can create scales with `Scale.get` or `new Scale`.
+
+With `Scale.get` you can get a scale by name, by binary string or its decimal equivalent.
+Also the result is cached, so the next three calls returns the __same__ object:
 
 ```
-new Scale('major')
-new Scale('101011010101')
-new Scale(2772)
+Scale.get('major')
+Scale.get('101011010101')
+Scale.get(2772)
+```
+
+With the constructor function a decimal number is required and always returns
+a new instance (so __its not recommended__):
+
+```
+var major = new Scale(2772)
+new Scale('major') // => exception
+new Scale('11000100000') // => exception
 ```
 
 #### Scale names
 
-Just 3 ('major', 'minor melodic', 'minor harminic'). A bigger dictionary is in process.
+Every scale can have one or more names:
+
+```
+Scale.get('major').names() // => ['major', 'ionian']
+```
+
+By default, only three names are available: 'major', 'melodic minor', 'harmonic minor'
+But you can load the library with other dictionaries:
+
+```
+var Scale = require('music-scale/common') // 45 scale names
+Scale.get('phrygian pentatonic')
+var Scale = require('music-scale/all') // 86 scale names
+Scale.geT('six tone symmetric')
+```
+
+See `common.js` and `all.js` in this repository.
 
 #### Scale intervals
 
