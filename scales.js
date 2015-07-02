@@ -17,7 +17,7 @@ Scales.addNames = function (names) {
     })
   })
 }
-Scales.commonScaless = [2708, 2418, 2514, 2387, 2773, 2901, 2905]
+Scales.commonScales = [2708, 2418, 2514, 2387, 2773, 2901, 2905]
 
 Scales.addNames({
   '2708': [['major pentatonic'], ['dorian pentatonic'], ['phrygian pentatonic'],

@@ -20,6 +20,8 @@ function memoize (name, func) {
   }
 }
 
+function lengthOf (o) { return o.length }
+
 function Scale (num, name) {
   if (!(this instanceof Scale)) return new Scale(num)
 
@@ -43,11 +45,20 @@ function Scale (num, name) {
   }
 }
 
+/*
+ * Steps: the number of semitones required for each degree (step)
+ * For example, the major scale is 2,2,1,2,2,2,1 — starting on any given
+ * note (the first "degree"), the second degree is 2 semitones above the first,
+ * the third is 2 semitones above the second, the fourth is 1 semitone above
+ * the third, and so on.
+ *
+ * @return an array of semitones for each step
+ *
+ * @example Scale(2773).steps() // => [2, 2, 1, 2, 2, 2, 1]
+ */
 var STEPS = /1(0)*/g
 Scale.prototype.steps = memoize('steps', function () {
-  return (this.binary.match(STEPS)).map(function (zeros) {
-    return zeros.length
-  })
+  return (this.binary.match(STEPS)).map(lengthOf)
 })
 
 /*
@@ -111,12 +122,23 @@ Scale.prototype.modes = memoize('modes', function () {
   }
   return modes.filter(function (binary) {
     return binary.charAt(0) === '1'
+  }).map(function (binary) {
+    return new Scale(binary)
   })
+})
+
+Scale.prototype.cannonicalMode = memoize('cannonical', function () {
+  var ordered = this.modes().sort(function (scaleA, scaleB) {
+    var stepsA = +scaleA.steps().join('')
+    var stepsB = +scaleB.steps().join('')
+    return stepsA - stepsB
+  })
+  return ordered[ordered.length - 1]
 })
 
 Scale.prototype.mode = function (num) {
   var count = this.modes().length
-  return new Scale(this.modes()[(num - 1) % count])
+  return this.modes()[(num - 1) % count]
 }
 
 /*
