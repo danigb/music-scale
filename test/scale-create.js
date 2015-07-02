@@ -10,10 +10,12 @@ vows.describe('Binary Scales').addBatch({
   },
   'binary string': {
     'must have 12 digits': function () {
-      assert.throws(function () { return new Scale('010101') }, /12/)
+      var error = function () { return new Scale('010101') }
+      assert.throws(error, /number not valid/)
     },
     'should have root': function () {
-      assert.throws(function () { return new Scale('010101000000') }, /root/)
+      var error = function () { return new Scale('010101000000') }
+      assert.throws(error, /number not valid/)
     }
   },
   'can give names to a scale': {

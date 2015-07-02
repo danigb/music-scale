@@ -2,26 +2,6 @@
 
 module.exports = Scale
 
-/*
- * rotates a string of 12 characters length (a scale binary number)
- */
-function rotate (str, positions) {
-  return str.slice(positions, 12) + str.slice(0, positions)
-}
-
-/*
- * cache the return value inside the Object
- * only for no arguments functions
- */
-function memoize (name, func) {
-  name = '__' + name
-  return function () {
-    return this[name] ? this[name] : this[name] = func.apply(this, arguments)
-  }
-}
-
-function lengthOf (o) { return o.length }
-
 function Scale (num, name) {
   if (!(this instanceof Scale)) return new Scale(num)
 
@@ -34,19 +14,36 @@ function Scale (num, name) {
   } else {
     throw Error('Invalid scale number: ' + num)
   }
+  if (this.decimal < Scale.MIN || this.decimal > Scale.MAX) {
+    throw Error('Scale number not valid: ' + this.decimal +
+      ' (must be between ' + Scale.MIN + ' and ' + Scale.MAX + ')')
+  }
 
   this.length = this.binary.match(/1/g).length
   this._names = Array.isArray(name) ? name : [ name ]
-
-  validate(this.binary, this.decimal)
 }
 
-function validate (binary, decimal) {
-  if (binary.length !== 12) {
-    throw Error('Scale binary (' + binary + ') must have 12 digits: ' + binary.length)
-  } else if (binary.charAt(0) !== '1') {
-    throw Error('Scale should have root: ' + binary + ' (' + decimal + ')')
-  }
+Scale.MIN = parseInt('100000000000', 2)
+Scale.MAX = parseInt('111111111111', 2)
+
+Scale.get = function (identifier) {
+  Scale.cache(identifier, function () {
+    try {
+      return new Scale(identifier)
+    } catch(e) {
+      return Scale.get(Scale.Names.toNumber(identifier))
+    }
+  })
+}
+
+Scale.fromNumbers = function (array) {
+  var numbers = array.map(function (i) {
+    return i.toString()
+  })
+  var binary = NUMBERS.map(function (num) {
+    return numbers.indexOf(num) >= 0 ? '1' : '0'
+  }).join('')
+  return new Scale(binary)
 }
 
 Scale.prototype.names = function () { return this._names }
@@ -91,16 +88,6 @@ Scale.prototype.numbers = memoize('numbers', function () {
     })
     .filter(function (n) { return n })
 })
-
-Scale.fromNumbers = function (array) {
-  var numbers = array.map(function (i) {
-    return i.toString()
-  })
-  var binary = NUMBERS.map(function (num) {
-    return numbers.indexOf(num) >= 0 ? '1' : '0'
-  }).join('')
-  return new Scale(binary)
-}
 
 var INTERVALS = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4',
   'd5', 'P5', 'm6', 'M6', 'm7', 'M7']
@@ -164,3 +151,48 @@ Scale.prototype.coscale = function () {
   var inv = this.binary.replace(/0/g, 'L').replace(/1/g, '0').replace(/L/g, 1)
   return new Scale(rotate(inv, inv.indexOf('1')))
 }
+
+Scale.cache = (function (values) {
+  return function (id, generator) {
+    if (id) return values[id] || (values[id] = generator())
+  }
+})({})
+
+Scale.Names = (function (decToNames, nameToDec) {
+  return {
+    fromDecimal: function (decimal) { return decToNames[decimal] || [] },
+    toDecimal: function (name) { return nameToDec[name] },
+    add: function (decimal, names) {
+      decToNames[decimal] = names
+      names.forEach(function (name) { nameToDec[name] = decimal })
+    }
+  }
+})({}, {})
+Scale.Names.add('2773', ['major', 'ionian'])
+Scale.Names.add('2901', ['melodic minor', 'melodic'])
+Scale.Names.add('2905', ['harmonic minor', 'harmonic'])
+Scale.Names.add('2709', ['major pentatonic'])
+
+/*
+ * rotates a string of 12 characters length (a scale binary number)
+ */
+function rotate (str, positions) {
+  return str.slice(positions, 12) + str.slice(0, positions)
+}
+
+/*
+ * cache the return value inside the Object
+ * only for no arguments functions
+ */
+function memoize (name, func, setter) {
+  name = '__' + name
+  return function () {
+    if (setter && arguments.length === 1) {
+      this[name] = arguments[0]
+    } else {
+      return this[name] ? this[name] : this[name] = func.apply(this, arguments)
+    }
+  }
+}
+
+function lengthOf (o) { return o.length }

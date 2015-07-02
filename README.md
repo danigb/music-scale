@@ -10,8 +10,7 @@ var major = new Scale(2773);
 major.intervals(); // => ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7']
 ```
 
-`music-scale` is inspired by the works of [Rich Cochrane](http://cochranemusic.com), [Kizuu](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html) and [William Zeitler](http://www.allthescales.org/)
-
+`music-scale` is inspired by the works of [Rich Cochrane](http://cochranemusic.com), [Walter Zettel](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html) and [William Zeitler](http://www.allthescales.org/)
 
 ## Usage
 
