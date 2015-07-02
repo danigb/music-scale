@@ -21,7 +21,7 @@ var groupedScales = groupedModes.map(function (group) {
     }
     scales.push(mode)
   })
-  return scales
+  return scales.map(function (s) { return s.cannonicalMode() })
 })
 
 console.log(groupedModes.map(function (g) { return g.length }))

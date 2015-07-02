@@ -1,16 +1,16 @@
 # music-scale
 
-Create (western, well tempered) musical scales with javascript.
+Create (western, well tempered) musical scales with javascript, implemented using binary numbers
 
 Library usage example:
 
 ```
 var Scale = require('music-scale');
-var major = new Scale('major');
+var major = new Scale(2773);
 major.intervals(); // => ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7']
 ```
 
-`music-scales` is implemented using binary numbers. Inspired by [Rich Cochrane](http://cochranemusic.com) and Phil O'Donnell
+`music-scale` is inspired by the works of [Rich Cochrane](http://cochranemusic.com), [Kizuu](http://www.muzuu.org/new_life/pics/simpleblog/scales/scalesadvice.html) and [William Zeitler](http://www.allthescales.org/)
 
 
 ## Usage
