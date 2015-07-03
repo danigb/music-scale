@@ -25,6 +25,11 @@ vows.describe('Scale creation').addBatch({
     }
   },
   'Constructor': {
+    'integer': function () {
+      var s = new Scale(2773)
+      assert.equal(s.decimal, 2773)
+      assert.equal(s.binary, '101011010101')
+    },
     'validation': {
       'must have 12 digits': function () {
         var error = function () { return new Scale(Scale.MIN - 1) }
@@ -34,21 +39,6 @@ vows.describe('Scale creation').addBatch({
         var error = function () { return new Scale(Scale.MAX + 1) }
         assert.throws(error, /number not valid/)
       }
-    },
-    'can give names to a scale': {
-      'custom names': function () {
-        assert.equal(new Scale(2773, ['my scale']).name(), 'my scale')
-      },
-      'multiple names': function () {
-        var s = new Scale(2773, ['blah', 'ionian', 'major'])
-        assert.equal(s.name(), 'blah')
-        assert.deepEqual(s.names(), ['blah', 'ionian', 'major'])
-      }
-    },
-    'integer': function () {
-      var s = new Scale(2773)
-      assert.equal(s.decimal, 2773)
-      assert.equal(s.binary, '101011010101')
     }
   }
 }).export(module)

@@ -13,7 +13,10 @@
   "keywords": [
     "music",
     "scale",
+    "scales",
     "theory",
+    "harmony",
+    "jazz",
     "midi"
   ],
   "author": "danigb <danigb@gmail.com>",
@@ -25,5 +28,8 @@
   "devDependencies": {
     "note-pitch": "^0.6.0",
     "vows": "^0.8.1"
+  },
+  "dependencies": {
+    "method-memoize": "^1.0.0"
   }
 }

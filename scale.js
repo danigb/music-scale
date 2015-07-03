@@ -2,7 +2,11 @@
 
 var IS_BINARY = /^[01]+$/
 var IS_NUMBER = /^\d+$/
-function Scale (num, names) {
+
+/*
+ * Scale constructor
+ */
+function Scale (num) {
   if (!(this instanceof Scale)) return Scale.get(num)
 
   if (IS_NUMBER.test(num)) {
@@ -17,7 +21,6 @@ function Scale (num, names) {
   }
 
   this.length = this.binary.match(/1/g).length
-  if (names) this._names = names
 }
 
 Scale.MIN = parseInt('100000000000', 2)
@@ -52,7 +55,7 @@ Scale.all = function () {
   return Scale._all
 }
 
-Scale.prototype.names = function () { return this._names || Scale.Names.fromDecimal(this.decimal) }
+Scale.prototype.names = function () { return Scale.Names.fromDecimal(this.decimal) }
 Scale.prototype.name = function () { return this.names()[0] }
 
 /*
@@ -183,6 +186,7 @@ Scale.Names = (function (decToNames, nameToDec) {
       names.forEach(function (name) { nameToDec[name] = decimal })
     })
   }
+  store.names = function () { return Object.keys(nameToDec) }
   store.fromDecimal = function (decimal) { return decToNames[decimal] || [] }
   store.toDecimal = function (name) { return nameToDec[name] }
   return store
