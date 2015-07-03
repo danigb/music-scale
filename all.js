@@ -89,4 +89,5 @@ Scale.Names({
   '3546': ['spanish heptatonic']
 })
 
-module.exports = Scale
+if (typeof module === 'object' && module.exports) module.exports = Scale
+if (typeof window !== 'undefined') window.Scale = Scale

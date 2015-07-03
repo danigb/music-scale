@@ -46,4 +46,6 @@ Scale.Names({
   '3668': [ 'third blues mode 5' ],
   '3732': [ 'second blues mode 2' ]
 })
-module.exports = Scale
+
+if (typeof module === 'object' && module.exports) module.exports = Scale
+if (typeof window !== 'undefined') window.Scale = Scale
