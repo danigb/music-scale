@@ -47,14 +47,15 @@ new Scale('11000100000') // => exception
 
 #### Scale names
 
-Every scale can have one or more names:
+Every scale can have one or more names. `name` method always returns the first one:
 
 ```js
 Scale.get('major').names() // => ['major', 'ionian']
+Scale.get('ionian').name() // => 'major'
 ```
 
-By default, only three names are available: 'major', 'melodic minor', 'harmonic minor'
-But you can load the library with other dictionaries:
+By default, only three scale names are available: 'major', 'melodic minor', 'harmonic minor'
+But you can load the library with other dictionaries, so instead of `require('music-scale')` you can:
 
 ```js
 var Scale = require('music-scale/common') // 45 scale names
@@ -63,7 +64,8 @@ var Scale = require('music-scale/all') // 86 scale names
 Scale.geT('six tone symmetric')
 ```
 
-See `common.js` and `all.js` in this repository.
+See [`common.js`](https://github.com/danigb/music-scale/blob/master/common.js) and
+[`all.js`](https://github.com/danigb/music-scale/blob/master/all.js) in this repository.
 
 #### Scale intervals
 
