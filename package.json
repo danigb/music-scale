@@ -1,8 +1,8 @@
 {
   "name": "music-scale",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Music scales implemented with binary numbers",
-  "main": "index.js",
+  "main": "scale.js",
   "scripts": {
     "test": "vows test/*.js"
   },

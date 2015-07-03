@@ -46,5 +46,7 @@ vows.describe('Scale modes').addBatch({
     assert.equal(modes[4].name(), 'mixolydian')
     assert.equal(modes[5].name(), 'aeolian')
     assert.equal(modes[6].name(), 'locrian')
+    assert.equal(s.mode(1).name(), s.mode(8).name())
+    assert(s.mode(1) === s.mode(8), 'is the same!')
   }
 }).export(module)

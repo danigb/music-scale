@@ -1,8 +1,6 @@
 # music-scale
 
-Create (western, well tempered) musical scales with javascript, implemented using binary numbers
-
-Library usage example:
+Create (western, well tempered) musical scales with javascript:
 
 ```js
 var Scale = require('music-scale');
@@ -23,29 +21,84 @@ Install with npm: `npm install music-scale` and require it:
 var Scale = require('music-scale')
 ```
 
-#### Create scales
+#### Scale names
+
+In order to reduce the code, you can choose the size of the dictionary.
+By default, only three scale names are available: 'major', 'melodic minor', 'harmonic minor'
+But you can load the library with other dictionaries, so instead of `require('music-scale')` you can:
+
+```js
+var Scale = require('music-scale') // 3 scale names
+Scale.get('major')
+
+// or ...
+var Scale = require('music-scale/common') // 45 scale names
+Scale.get('phrygian pentatonic')
+
+// or ...
+var Scale = require('music-scale/all') // 86 scale names
+Scale.geT('six tone symmetric')
+```
+
+See [`common.js`](https://github.com/danigb/music-scale/blob/master/common.js) and
+[`all.js`](https://github.com/danigb/music-scale/blob/master/all.js) in this repository.
+
+## API
+
+#### Scale.get
 
 You can create scales with `Scale.get` or `new Scale`.
 
-With `Scale.get` you can get a scale by name, by binary string or its decimal equivalent.
-Also the result is cached, so the next three calls returns the __same__ object:
+Get a scale by name, by binary string or its decimal equivalent.
+The result is cached and the scales are created by demand:
 
 ```js
-Scale.get('major')
-Scale.get('101011010101')
-Scale.get(2772)
+Scale.get('major') === Scale.get('101011010101') === Scale.get(2772)
 ```
 
-With the constructor function a decimal number is required and always returns
-a new instance (so __its not recommended__):
+#### Scale.all
+
+You can create all the possibles scales (2048) with this method. There are 2048 possible scales
+because, given a binary representation of a scale (12 digit), the first digit must always be
+positive (all scales have root), so the valid interval is from '100000000000' to '111111111111'
 
 ```js
-var major = new Scale(2772)
+Scale.MIN; // => 2048 ('100000000000')
+Scale.MAX; // => 4905 ('111111111111')
+Scale.all().length; // => 2048
+```
+
+You can use it to filter the scales:
+
+```js
+var pentatonics = Scale.all.filter(function(scale) { return scale.length === 5 })
+```
+
+For example, to recreate the [allthescales.org](http://allthescales.org) scales,
+you must filter by leap:
+
+```js
+var allthescales = Scale.all.filter(function(scale) { return scale.leap() < 5 })
+var heptatonics = Scaleallthescales.filter(function(scale) { return scale.length === 7 })
+var cannonicalHeptatonics = heptatonics.filter(function(scale) { return scale.isCannonical() })
+heptatonics.length // => 413
+cannonicalHeptatonics.length // => 59
+```
+
+#### `new Scale`
+
+You can use the constructor to create a Scale, but only decimal numbers are allowed
+and you loose the cache, so I can't think any reason to use it:
+
+```js
+var major = new Scale(2773) // don't do that, use Scale.get(2773)
 new Scale('major') // => exception
 new Scale('11000100000') // => exception
 ```
 
-#### Scale names
+## Scale methods
+
+#### name() and names()
 
 Every scale can have one or more names. `name` method always returns the first one:
 
@@ -54,22 +107,9 @@ Scale.get('major').names() // => ['major', 'ionian']
 Scale.get('ionian').name() // => 'major'
 ```
 
-By default, only three scale names are available: 'major', 'melodic minor', 'harmonic minor'
-But you can load the library with other dictionaries, so instead of `require('music-scale')` you can:
+#### intervals()
 
-```js
-var Scale = require('music-scale/common') // 45 scale names
-Scale.get('phrygian pentatonic')
-var Scale = require('music-scale/all') // 86 scale names
-Scale.geT('six tone symmetric')
-```
-
-See [`common.js`](https://github.com/danigb/music-scale/blob/master/common.js) and
-[`all.js`](https://github.com/danigb/music-scale/blob/master/all.js) in this repository.
-
-#### Scale intervals
-
-All scales have a `intervals()` method that returns an array of intervals.
+Returns an array of intervals:
 
 ```js
 var major = new Scale(2772)
@@ -83,23 +123,31 @@ var Note = require('note-pitch')
 Note.transpose('C', major.intervals()) //=> ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4']
 ```
 
-#### Modes
+#### modes() and mode(number)
+
+Get the scale modes:
 
 ```js
-major = new Scale(2772)
-ionian = major.mode(1) // same scale
-dorian = major.mode(2)
-mixolydian = major.mode(5)
+var major = new Scale(2772)
+var ionian = major.mode(1) // 1 based index
+var major === ionian // true, same scale
+var dorian = major.mode(2)
+var mixolydian = major.mode(5)
+var major.mode(1) === major.mode(8) // true, same scale
 ```
 
-#### Coscale relationship
+#### coscale()
+
+Get the coscale:
 
 ```js
 var majorPentatonic = new Scale(2772).coscale()
 majorPentatonic.binary // => '101001010100'
 ```
 
-#### Scale reflection
+#### reflection()
+
+Get the reflected scale:
 
 ```js
 var major = new Scale(2772)

@@ -44,6 +44,16 @@ Scale.fromNumbers = function (array) {
   return Scale.get(binary)
 }
 
+Scale.all = function () {
+  if (!Scale._all) {
+    Scale._all = []
+    for (var i = Scale.MIN; i <= Scale.MAX; i++) {
+      Scale._all.push(Scale.get(i))
+    }
+  }
+  return Scale._all
+}
+
 Scale.prototype.names = function () { return this._names || Scale.Names.fromDecimal(this.decimal) }
 Scale.prototype.name = function () { return this.names()[0] }
 
@@ -132,6 +142,9 @@ Scale.prototype.cannonicalMode = function () {
     return stepsA - stepsB
   })
   return ordered[ordered.length - 1]
+}
+Scale.prototype.isCannonical = function () {
+  return this.cannonicalMode() === this
 }
 
 /*
