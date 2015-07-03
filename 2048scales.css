@@ -1,0 +1,40 @@
+
+body {
+  font-family: 'myriad pro', sans-serif;
+  font-size: 20px;
+  border: 0;
+}
+
+button {
+  background-color: #1FADC5;
+  border: 1px solid rgba(0,0,0,.2);
+  font-size: 100%;
+  color: #fff;
+  padding: .6em 1.2em;
+  border-radius: 1em;
+  cursor: pointer;
+  margin: 0 .3em;
+  outline: none;
+}
+
+.container {
+  width: 40em;
+  margin: 10px auto;
+}
+
+.scales {
+  width: 100%; overflow: hidden;
+}
+
+.scales .scale {
+  float: left;
+  background-color: #efefef;
+  border: 1px solid transparent;
+  margin: 0.2em 0.2em 0 0;
+  font-size: 0.5em;
+  width: 2em; height: 2em;
+}
+.scale.named { border: 1px solid black; }
+.scale.active {
+  background-color: yellow;
+}
