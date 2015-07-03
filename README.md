@@ -47,10 +47,8 @@ See [`common.js`](https://github.com/danigb/music-scale/blob/master/common.js) a
 
 #### Scale.get
 
-You can create scales with `Scale.get` or `new Scale`.
-
 Get a scale by name, by binary string or its decimal equivalent.
-The result is cached and the scales are created by demand:
+The result is cached and the scales are created on demand:
 
 ```js
 Scale.get('major') === Scale.get('101011010101') === Scale.get(2772)
@@ -58,9 +56,7 @@ Scale.get('major') === Scale.get('101011010101') === Scale.get(2772)
 
 #### Scale.all
 
-You can create all the possibles scales (2048) with this method. There are 2048 possible scales
-because, given a binary representation of a scale (12 digit), the first digit must always be
-positive (all scales have root), so the valid interval is from '100000000000' to '111111111111'
+You can create all the possibles scales (2048, see theory below) with this method:
 
 ```js
 Scale.MIN; // => 2048 ('100000000000')
@@ -162,16 +158,24 @@ The following explanations are extracted from the book. (The book has a Creative
 
 ### Binary representations of scales
 
-The major scale is `1 0 1 0 1 1 0 1 0 1 0 1`. This number (2773 in decimal, see previous example) uniquely represents the Major scale. The method of representation is simple: each position, reading left to right, represents a note: 1, b2, 2 and so on. A `1` in that position means the note is included in the scale and a `0` means it is not included. So we have:
+> The major scale is `1 0 1 0 1 1 0 1 0 1 0 1`. This number (2773 in decimal, see previous example) uniquely represents the Major scale. The method of representation is simple: each position, reading left to right, represents a note: 1, b2, 2 and so on. A `1` in that position means the note is included in the scale and a `0` means it is not included. So we have:
 
 ```
 1   0   1   0   1   1    0   1   0   1   0   1
 1  b2   2  b3   3   4   b5   5  b6   6  b7   7
 ```
 
+### 2048 scales
+
+All the scales have root, so the smallest scale is '100000000000' (2048) and
+the biggest is '111111111111' (4095), so the total number is 2048 (4096 - 2048)
+
+Most of they are not interesting enough to be used in music.
+For example, allthescales.org limit all the possibilities to those with leap < 5 (1490)
+
 ### Scale modes
 
-Note that modes of a scale are obtained by the technique known as 'bit rotation'. We would normally eliminate all those rows that begin with a zero, since they don't contain a root note:
+> Note that modes of a scale are obtained by the technique known as 'bit rotation'. We would normally eliminate all those rows that begin with a zero, since they don't contain a root note:
 
 ```
 101011010101 // ionian
