@@ -1,6 +1,6 @@
 {
   "name": "music-scale",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Music scales implemented with binary numbers",
   "main": "scale.js",
   "scripts": {

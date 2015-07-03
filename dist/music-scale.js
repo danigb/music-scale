@@ -1,9 +1,30 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = function(method) {
+  var memoized = function() {
+    var cache = this['__cache' + memoized.cacheId] ||
+      (this['__cache' + memoized.cacheId] = {});
+    var key = [].join.call(arguments, '|');
+    if (cache.hasOwnProperty(key))
+      return cache[key];
+    return (cache[key] = method.apply(this, arguments));
+  }
+  memoized.cacheId = '' + Date.now() + Math.random();
+
+  return memoized;
+}
+
+},{}],2:[function(require,module,exports){
 'use strict'
+
+var memoize = require('method-memoize')
 
 var IS_BINARY = /^[01]+$/
 var IS_NUMBER = /^\d+$/
-function Scale (num, names) {
+
+/*
+ * Scale constructor
+ */
+function Scale (num) {
   if (!(this instanceof Scale)) return Scale.get(num)
 
   if (IS_NUMBER.test(num)) {
@@ -18,7 +39,6 @@ function Scale (num, names) {
   }
 
   this.length = this.binary.match(/1/g).length
-  if (names) this._names = names
 }
 
 Scale.MIN = parseInt('100000000000', 2)
@@ -53,7 +73,7 @@ Scale.all = function () {
   return Scale._all
 }
 
-Scale.prototype.names = function () { return this._names || Scale.Names.fromDecimal(this.decimal) }
+Scale.prototype.names = memoize(function () { return Scale.Names.fromDecimal(this.decimal) })
 Scale.prototype.name = function () { return this.names()[0] }
 
 /*
@@ -68,24 +88,24 @@ Scale.prototype.name = function () { return this.names()[0] }
  * @example Scale(2773).steps() // => [2, 2, 1, 2, 2, 2, 1]
  */
 var STEPS = /1(0)*/g
-Scale.prototype.steps = function () {
+Scale.prototype.steps = memoize(function () {
   return (this.binary.match(STEPS)).map(lengthOf)
-}
+})
 
 /*
- * leap
+ * leap()
+ *
+ * the maximum number of semitones between two notes of the scale
  *
  * Useful to limit the number of scales: "The requirement of no step greater
  * than a major third is somewhat arbitrary, but does allow us to include
  * commonly used scales like the Pentatonic" - William Zeitler
- *
- * @returns the maximum number of semitones between two notes of the scale
  */
-Scale.prototype.leap = function () {
+Scale.prototype.leap = memoize(function () {
   return (this.binary.match(STEPS)).reduce(function (num, zeros) {
     return Math.max(num, zeros.length)
   }, 0)
-}
+})
 
 var NUMBERS = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7']
 Scale.prototype.numbers = function () {
@@ -116,7 +136,7 @@ function specialCase (intervals, a, aVal, b, bVal, aSus, bSus) {
   }
 }
 
-Scale.prototype.modes = function () {
+Scale.prototype.modes = memoize(function () {
   var modes = []
   for (var i = 0; i < 12; i++) {
     modes.push(rotate(this.binary, i))
@@ -127,21 +147,21 @@ Scale.prototype.modes = function () {
     return Scale.get(binary)
   })
   return m
-}
+})
 
 Scale.prototype.mode = function (num) {
   var count = this.modes().length
   return this.modes()[(num - 1) % count]
 }
 
-Scale.prototype.cannonicalMode = function () {
-  var ordered = this.modes().sort(function (scaleA, scaleB) {
+Scale.prototype.cannonicalMode = memoize(function () {
+  var ordered = this.modes().concat().sort(function (scaleA, scaleB) {
     var stepsA = +scaleA.steps().join('')
     var stepsB = +scaleB.steps().join('')
     return stepsA - stepsB
   })
   return ordered[ordered.length - 1]
-}
+})
 Scale.prototype.isCannonical = function () {
   return this.cannonicalMode() === this
 }
@@ -154,15 +174,18 @@ Scale.prototype.isModeOf = function (other) {
     (binary + binary).indexOf(this.binary) !== -1
 }
 
-Scale.prototype.reflection = function () {
+Scale.prototype.reflection = memoize(function () {
   return Scale.get(this.binary.split('').reverse().join(''))
-}
+})
 
-Scale.prototype.coscale = function () {
+Scale.prototype.coscale = memoize(function () {
   var inv = this.binary.replace(/0/g, 'L').replace(/1/g, '0').replace(/L/g, 1)
   return Scale.get(rotate(inv, inv.indexOf('1')))
-}
+})
 
+/*
+ * Used to store Scale instances
+ */
 Scale.cache = (function (values) {
   return function (id, generator) {
     return values[id] || (values[id] = generator())
@@ -184,6 +207,7 @@ Scale.Names = (function (decToNames, nameToDec) {
       names.forEach(function (name) { nameToDec[name] = decimal })
     })
   }
+  store.names = function () { return Object.keys(nameToDec) }
   store.fromDecimal = function (decimal) { return decToNames[decimal] || [] }
   store.toDecimal = function (name) { return nameToDec[name] }
   return store
@@ -208,4 +232,4 @@ function lengthOf (o) { return o.length }
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{}]},{},[1]);
+},{"method-memoize":1}]},{},[2]);
