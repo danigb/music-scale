@@ -45,7 +45,7 @@ See [`common.js`](https://github.com/danigb/music-scale/blob/master/common.js) a
 
 ## API
 
-#### Scale.get
+#### Scale.get(name | binary | decimal)
 
 Get a scale by name, by binary string or its decimal equivalent.
 The result is cached and the scales are created on demand:
@@ -54,7 +54,7 @@ The result is cached and the scales are created on demand:
 Scale.get('major') === Scale.get('101011010101') === Scale.get(2772)
 ```
 
-#### Scale.all
+#### Scale.all()
 
 You can create all the possibles scales (2048, see theory below) with this method:
 
@@ -75,13 +75,13 @@ you must filter by leap:
 
 ```js
 var allthescales = Scale.all.filter(function(scale) { return scale.leap() < 5 })
-var heptatonics = Scaleallthescales.filter(function(scale) { return scale.length === 7 })
+var heptatonics = allthescales.filter(function(scale) { return scale.length === 7 })
 var cannonicalHeptatonics = heptatonics.filter(function(scale) { return scale.isCannonical() })
 heptatonics.length // => 413
 cannonicalHeptatonics.length // => 59
 ```
 
-#### `new Scale`
+#### `new Scale(decimal)`
 
 You can use the constructor to create a Scale, but only decimal numbers are allowed
 and you loose the cache, so I can't think any reason to use it:
@@ -130,6 +130,19 @@ var major === ionian // true, same scale
 var dorian = major.mode(2)
 var mixolydian = major.mode(5)
 var major.mode(1) === major.mode(8) // true, same scale
+```
+
+#### cannonicalMode() and isCannonical()
+
+Get the cannonical mode, as defined in allthescales.org:
+
+> The "canonical form" of a scale is that mode that has the greatest possible number of its larger steps at the beginning of the mode, and the greatest possible number of its smaller steps at the end of the mode. For example, considering the diatonic scale, the mode with the greatest number of larger intervals first is the one beginning with the greatest sequence of whole tones — the Lydian mode.
+
+```js
+var major = Scale.get('major')
+major.cannonicalMode().name() // => 'lydian'
+var dorian = major.mode(2)
+dorian.cannonicalMode().name() // => 'lydian'
 ```
 
 #### coscale()
