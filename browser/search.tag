@@ -19,17 +19,16 @@
 
   <script>
     var app = this.opts.app
-    this.results = app.scales.search('')
+    console.log(app)
+    this.results = app.scales.search(app.state.pattern)
     this.total = app.scales.names().length
 
     select(e) {
-      var name = e.target.getAttribute('data-name')
-      app.events.trigger('select', name)
+      app.select(e.target.getAttribute('data-name'))
     }
 
     search(e) {
-      var pattern = this.pattern = e.target.value
-      this.results = app.scales.search(pattern)
+      app.setPattern(e.target.value)
       this.update()
     }
   </script>

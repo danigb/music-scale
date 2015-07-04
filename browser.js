@@ -1,36 +1,91 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ app }"></search> </div> <div class="scale"> <div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
+riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
+
+
+});
+
+},{"riot":9}],2:[function(require,module,exports){
+var riot = require('riot')
+var ScalesStore = require('./store.js')
+
+// Tags
+var browser = require('./browser.tag')
+require('./search.tag')
+require('./scale.tag')
+
+var App = function (state) {
+  this.state = state
+  this.events = riot.observable({})
+  this.scales = ScalesStore
+}
+
+App.prototype.setPattern = function (pattern) {
+  this.state.pattern = pattern
+  this.events.trigger('search')
+}
+
+App.prototype.select = function (name) {
+  this.state.selected = name
+  this.events.trigger('select')
+}
+
+App.prototype.getSelected = function () {
+  return this.scales.get(this.state.selected)
+}
+
+riot.mount(browser, { app: new App({
+  pattern: '',
+  selected: 'major'
+}) })
+
+},{"./browser.tag":1,"./scale.tag":3,"./search.tag":4,"./store.js":5,"riot":9}],3:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
     var self = this
-    this.app = this.opts.app
+    var app = this.opts.app
+    self.scale = app.getSelected()
 
     this.select = function(e) {
-      this.app.events.trigger('select', e.target.getAttribute('data-name'))
+      app.select(e.target.getAttribute('data-name'))
     }.bind(this);
 
-    this.app.events.on('select', function(name) {
-      self.scale = self.app.scales.get(name)
+    app.events.on('select', function(name) {
+      self.scale = app.getSelected()
       self.update()
       document.body.scrollTop = document.documentElement.scrollTop = 0
     })
-    this.app.events.trigger('select', 'major')
-
-
   
 });
 
-},{"riot":7}],2:[function(require,module,exports){
-var riot = require('riot')
+},{"riot":9}],4:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of { total }</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
+    var app = this.opts.app
+    console.log(app)
+    this.results = app.scales.search(app.state.pattern)
+    this.total = app.scales.names().length
+
+    this.select = function(e) {
+      app.select(e.target.getAttribute('data-name'))
+    }.bind(this);
+
+    this.search = function(e) {
+      app.setPattern(e.target.value)
+      this.update()
+    }.bind(this);
+  
+});
+
+},{"riot":9}],5:[function(require,module,exports){
 var Scale = require('music-scale/all')
-var browser = require('./browser.tag')
-require('./search.tag')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
 var NAMES = Scale.Names.names()
 
-var ScalesStore = {
+module.exports = {
   names: function () {
     return NAMES
   },
@@ -64,34 +119,7 @@ var ScalesStore = {
   }
 }
 
-var App = function () {
-  this.events = riot.observable({})
-  this.scales = ScalesStore
-}
-
-riot.mount(browser, { app: new App() })
-
-},{"./browser.tag":1,"./search.tag":3,"music-scale/all":5,"riot":7}],3:[function(require,module,exports){
-var riot = require('riot');
-module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of { total }</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
-    var app = this.opts.app
-    this.results = app.scales.search('')
-    this.total = app.scales.names().length
-
-    this.select = function(e) {
-      var name = e.target.getAttribute('data-name')
-      app.events.trigger('select', name)
-    }.bind(this);
-
-    this.search = function(e) {
-      var pattern = this.pattern = e.target.value
-      this.results = app.scales.search(pattern)
-      this.update()
-    }.bind(this);
-  
-});
-
-},{"riot":7}],4:[function(require,module,exports){
+},{"music-scale/all":7}],6:[function(require,module,exports){
 module.exports = function(method) {
   var memoized = function() {
     var cache = this['__cache' + memoized.cacheId] ||
@@ -106,7 +134,7 @@ module.exports = function(method) {
   return memoized;
 }
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict'
 var Scale = require('./')
 Scale.Names({
@@ -201,7 +229,7 @@ Scale.Names({
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"./":6}],6:[function(require,module,exports){
+},{"./":8}],8:[function(require,module,exports){
 'use strict'
 
 var memoize = require('method-memoize')
@@ -420,7 +448,7 @@ function lengthOf (o) { return o.length }
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"method-memoize":4}],7:[function(require,module,exports){
+},{"method-memoize":6}],9:[function(require,module,exports){
 /* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {
