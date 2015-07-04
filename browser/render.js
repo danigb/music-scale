@@ -11,10 +11,9 @@ module.exports = function (canvas, width, height, scale) {
   var stave = new VexFlow.Stave(10, 0, width)
   stave.addClef('treble').setContext(ctx).draw()
 
-  console.log('rendering ', scale.notes)
   var notes = scale.notes.map(function (name) {
     var note = Note.parse(name)
-    var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/4'], duration: 'q' })
+    var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/' + note.oct], duration: 'q' })
     if (note.acc) {
       staveNote.addAccidental(0, new VexFlow.Accidental(note.acc))
     }

@@ -2,10 +2,10 @@
 <browser>
   <div class="app">
     <div class="search">
-      <search app={ opts.app }></search>
+      <search app={ opts.app } />
     </div>
     <div class="scale">
-      <scale app={ opts.app }>
+      <scale app={ opts.app } />
     </div>
   </div>
 

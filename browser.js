@@ -1,25 +1,31 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var riot = require('riot');
-module.exports = 
-riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app a, [riot-tag="browser"] .app a{ color: black; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
+'use strict'
 
-
-});
-
-},{"riot":13}],2:[function(require,module,exports){
 var riot = require('riot')
-var ScalesStore = require('./store.js')
 
-// Tags
-var browser = require('./browser.tag')
-require('./search.tag')
-require('./scale.tag')
+module.exports = App
 
-var App = function (state) {
+var ROOTS = 'c db d eb e f f# gb g ab a bb b'.split(' ').map(function (root) {
+  return root.replace(/^./, function (match) { return match.toUpperCase() })
+})
+
+function App (state) {
   this.state = state
   this.events = riot.observable({})
-  this.scales = ScalesStore
+  this.scales = require('./scales.js')
   this.render = require('./render.js')
+}
+
+App.prototype.getRoots = function () {
+  var selected = this.state.root
+  return ROOTS.map(function (name) {
+    return { name: name, selected: name === selected }
+  })
+}
+
+App.prototype.setRoot = function (root) {
+  this.state.root = root
+  this.events.trigger('select')
 }
 
 App.prototype.setPattern = function (pattern) {
@@ -33,22 +39,35 @@ App.prototype.select = function (name) {
 }
 
 App.prototype.getSelected = function () {
-  return this.scales.get(this.state.selected)
+  return this.scales.get(this.state.selected, this.state.root)
 }
 App.prototype.getResults = function () {
   return this.scales.search(this.state.pattern)
 }
 
-riot.mount(browser, { app: new App({
+},{"./render.js":3,"./scales.js":4,"riot":15}],2:[function(require,module,exports){
+var riot = require('riot')
+var App = require('./app.js')
+
+// Tags
+var browser = require('./tags/browser.tag')
+require('./tags/search.tag')
+require('./tags/scale.tag')
+require('./tags/roots.tag')
+
+var app = new App({
   pattern: '',
-  selected: 'major'
-}) })
+  selected: 'major',
+  root: 'C'
+})
+
+riot.mount(browser, { app: app })
 
 setTimeout(function () {
-  ScalesStore.build()
+  app.scales.build()
 }, 500)
 
-},{"./browser.tag":1,"./render.js":3,"./scale.tag":4,"./search.tag":5,"./store.js":6,"riot":13}],3:[function(require,module,exports){
+},{"./app.js":1,"./tags/browser.tag":5,"./tags/roots.tag":6,"./tags/scale.tag":7,"./tags/search.tag":8,"riot":15}],3:[function(require,module,exports){
 var Note = require('note-pitch')
 var VexFlow = Vex.Flow
 
@@ -62,10 +81,9 @@ module.exports = function (canvas, width, height, scale) {
   var stave = new VexFlow.Stave(10, 0, width)
   stave.addClef('treble').setContext(ctx).draw()
 
-  console.log('rendering ', scale.notes)
   var notes = scale.notes.map(function (name) {
     var note = Note.parse(name)
-    var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/4'], duration: 'q' })
+    var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/' + note.oct], duration: 'q' })
     if (note.acc) {
       staveNote.addAccidental(0, new VexFlow.Accidental(note.acc))
     }
@@ -92,17 +110,105 @@ module.exports = function (canvas, width, height, scale) {
   voice.draw(ctx, stave)
 }
 
-},{"note-pitch":10}],4:[function(require,module,exports){
+},{"note-pitch":12}],4:[function(require,module,exports){
+var Scale = require('music-scale/all')
+var Note = require('note-pitch')
+
+var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
+'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
+
+var NAMES = Scale.Names.names()
+var all = [].concat(NAMES)
+
+function isValidPattern (pattern) {
+  return pattern &&               // present
+    !/^\s*$/.test(pattern) &&     // not empty
+    !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
+
+function scaleData (name, root, scale) {
+  if (!scale) return null
+  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
+  s.type = types[scale.length - 1]
+  s.altnames = scale.names().filter(function (altName) {
+    return altName !== name
+  }).join(', ')
+  s.modes = scale.modes().map(function (mode) {
+    return { binary: mode.binary, name: mode.name() }
+  })
+  s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
+  console.log('build scale', scale.intervals(), root)
+  s.notes = Note.transpose(root, scale.intervals())
+  s.spell = s.notes.join(',')
+  return s
+}
+
+module.exports = {
+  names: function () {
+    return all
+  },
+  search: function (pattern) {
+    if (!isValidPattern(pattern)) {
+      return NAMES
+    } else {
+      if (/^[01]+$/.test(pattern)) pattern = '[' + pattern
+      return all.filter(function (name) {
+        return name.indexOf(pattern) >= 0
+      })
+    }
+  },
+  get: function (name, root) {
+    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
+    return scaleData(name, root, Scale.get(name))
+  },
+  build: function () {
+    Scale.all().forEach(function (scale) {
+      if (scale.name()) return
+      all.push('' + scale.decimal + ' [' + scale.binary + '] ' + types[scale.length - 1])
+    })
+  }
+}
+
+},{"music-scale/all":10,"note-pitch":12}],5:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Notes</h3> <div class="notes"> <div>{ scale.spell }</div> <canvas id="score" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
+module.exports = 
+riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"></scale> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app a, [riot-tag="browser"] .app a{ color: black; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
+
+
+});
+
+},{"riot":15}],6:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag('roots', '<div class="roots"> <a each="{ roots }" class="{ root: true, selected: selected }" href="#" onclick="{ parent.selected }"> { name } </a> </div>', 'roots .roots, [riot-tag="roots"] .roots{ width: 100%; overflow: hidden; } roots .roots a, [riot-tag="roots"] .roots a{ display: block; float: left; text-decoration: none; padding: 0.2em 0.5em 0 0.5em; border: 1px solid black; margin-right: 0.2em; } roots .roots a.selected, [riot-tag="roots"] .roots a.selected{ background-color: yellow; }', function(opts) {
     var self = this
     var app = this.opts.app
-    self.scale = app.getSelected()
+    self.roots = app.getRoots()
+
+    app.events.on('select', function() {
+      self.roots = app.getRoots()
+      console.log('roots selected', self.roots)
+      self.update()
+    })
+
+    this.selected = function(e) {
+      app.setRoot(e.target.innerHTML.trim())
+    }.bind(this);
+  
+});
+
+},{"riot":15}],7:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Notes</h3> <div class="notes"> <roots app="{ opts.app }" root="{ root }"></roots> <canvas id="score" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
+    var self = this
+    var app = this.opts.app
+    this.state = app.state
+    this.scale = app.getSelected()
+    this.root = app.state.root
     var canvas = this.score
     var VexFlow = typeof Vex !== 'undefined' ? Vex.Flow : null
 
     this.on('update', function() {
-      console.log('update', canvas, VexFlow)
+      this.root = app.state.root
       app.render(canvas, 400, 100, app.getSelected())
     })
 
@@ -112,13 +218,14 @@ module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Sca
 
     app.events.on('select', function(name) {
       self.scale = app.getSelected()
+      self.root = app.state.root
       self.update()
       document.body.scrollTop = document.documentElement.scrollTop = 0
     })
   
 });
 
-},{"riot":13}],5:[function(require,module,exports){
+},{"riot":15}],8:[function(require,module,exports){
 var riot = require('riot');
 module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search by scale name, <br>decimal or equivalent binary</label> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of 2048</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search label, [riot-tag="search"] label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
     var app = this.opts.app
@@ -138,65 +245,7 @@ module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search
   
 });
 
-},{"riot":13}],6:[function(require,module,exports){
-var Scale = require('music-scale/all')
-var Note = require('note-pitch')
-
-var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
-'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
-
-var NAMES = Scale.Names.names()
-var all = [].concat(NAMES)
-
-function isValidPattern (pattern) {
-  return pattern &&               // present
-    !/^\s*$/.test(pattern) &&     // not empty
-    !/^\d$/.test(pattern)         // if number, at least 2 digits
-}
-
-function scaleData (name, scale) {
-  if (!scale) return null
-  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
-  s.type = types[scale.length - 1]
-  s.altnames = scale.names().filter(function (altName) {
-    return altName !== name
-  }).join(', ')
-  s.modes = scale.modes().map(function (mode) {
-    return { binary: mode.binary, name: mode.name() }
-  })
-  s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
-  s.notes = Note.transpose('C', scale.intervals())
-  s.spell = s.notes.join(',')
-  return s
-}
-
-module.exports = {
-  names: function () {
-    return all
-  },
-  search: function (pattern) {
-    if (!isValidPattern(pattern)) {
-      return NAMES
-    } else {
-      if (/^[01]+$/.test(pattern)) pattern = '[' + pattern
-      return all.filter(function (name) {
-        return name.indexOf(pattern) >= 0
-      })
-    }
-  },
-  get: function (name) {
-    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
-    return scaleData(name, Scale.get(name))
-  },
-  build: function () {
-    Scale.all().forEach(function (scale) {
-      if (scale.name()) return
-      all.push('' + scale.decimal + ' [' + scale.binary + '] ' + types[scale.length - 1])
-    })
-  }
-}
-
-},{"music-scale/all":8,"note-pitch":10}],7:[function(require,module,exports){
+},{"riot":15}],9:[function(require,module,exports){
 module.exports = function(method) {
   var memoized = function() {
     var cache = this['__cache' + memoized.cacheId] ||
@@ -211,7 +260,7 @@ module.exports = function(method) {
   return memoized;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict'
 var Scale = require('./')
 Scale.Names({
@@ -306,7 +355,7 @@ Scale.Names({
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"./":9}],9:[function(require,module,exports){
+},{"./":11}],11:[function(require,module,exports){
 'use strict'
 
 var memoize = require('method-memoize')
@@ -525,7 +574,7 @@ function lengthOf (o) { return o.length }
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"method-memoize":7}],10:[function(require,module,exports){
+},{"method-memoize":9}],12:[function(require,module,exports){
 'use strict'
 
 var Interval = require('interval-parser')
@@ -606,11 +655,14 @@ var PITCH_CLASSES = 'cdefgabcdefgab'
 var ACCIDENTALS = ['bb', 'b', '', '#', '##']
 function transpose (note, interval) {
   note = parse(note, null, null)
-  if (!note) return null;
+  if (!note) return null
   interval = Interval(interval)
   var pitchIndex = PITCH_CLASSES.indexOf(note.pc)
-  var pc = PITCH_CLASSES[pitchIndex + interval.simple - 1]
-  var dest = parse(pc + (note.oct + interval.octaves))
+  var pitchDest = pitchIndex + interval.simple - 1
+  var pc = PITCH_CLASSES[pitchDest]
+  var octOffset = interval.octaves
+  if (pitchDest > 6) octOffset++
+  var dest = parse(pc + (note.oct + octOffset))
   var difference = interval.semitones - (dest.midi - note.midi)
   var reduced = difference % 12
   var octaves = (difference - reduced) / 12
@@ -620,7 +672,7 @@ function transpose (note, interval) {
 
 module.exports = Note
 
-},{"interval-parser":11,"note-parser":12}],11:[function(require,module,exports){
+},{"interval-parser":13,"note-parser":14}],13:[function(require,module,exports){
 'use strict';
 /*
  * parseInterval
@@ -718,7 +770,7 @@ function type(i) {
 if (typeof module === "object" && module.exports) module.exports = parseInterval;
 else i.parseInterval = parseInterval;
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict'
 
 var NOTE = /^([a-gA-G])(#{0,2}|b{0,2})(-?[0-9]{1}|[+]{0,2}|[-]{0,2})$/
@@ -783,7 +835,7 @@ function midiToFrequency (note) {
 
 module.exports = parse
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {

@@ -13,7 +13,7 @@ function isValidPattern (pattern) {
     !/^\d$/.test(pattern)         // if number, at least 2 digits
 }
 
-function scaleData (name, scale) {
+function scaleData (name, root, scale) {
   if (!scale) return null
   var s = { name: name, decimal: scale.decimal, binary: scale.binary }
   s.type = types[scale.length - 1]
@@ -24,7 +24,8 @@ function scaleData (name, scale) {
     return { binary: mode.binary, name: mode.name() }
   })
   s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
-  s.notes = Note.transpose('C', scale.intervals())
+  console.log('build scale', scale.intervals(), root)
+  s.notes = Note.transpose(root, scale.intervals())
   s.spell = s.notes.join(',')
   return s
 }
@@ -43,9 +44,9 @@ module.exports = {
       })
     }
   },
-  get: function (name) {
+  get: function (name, root) {
     if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
-    return scaleData(name, Scale.get(name))
+    return scaleData(name, root, Scale.get(name))
   },
   build: function () {
     Scale.all().forEach(function (scale) {
