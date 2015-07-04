@@ -2,8 +2,8 @@
   <h4>Search scale</h4>
   <input name="searchPattern" onkeyup={ search }>
   <div class="names">
-    <label>Showing { filtered.length } of { allNames.length }</label>
-    <a each={ filtered } data-name={ name }
+    <label>Showing { results.length } of { total }</label>
+    <a each={ name in results } data-name={ name }
       onclick={ parent.select } href="#">
       { name }
     </a>&nbsp;
@@ -18,28 +18,19 @@
   </style>
 
   <script>
-    this.allNames = Scale.Names.names().map(function (name) {
-      return { name: name, visible: true }
-    })
-    this.filtered = this.allNames.filter(byPattern)
-    this.total = this.allNames.length
+    var app = this.opts.app
+    this.results = app.scales.search('')
+    this.total = app.scales.names().length
 
     select(e) {
       var name = e.target.getAttribute('data-name')
-      this.opts.events.trigger('select', name)
+      app.events.trigger('select', name)
     }
 
     search(e) {
       var pattern = this.pattern = e.target.value
-      this.allNames.forEach(function (item) {
-        item.visible = pattern.length === 0 || item.name.indexOf(pattern) >= 0
-      })
-      this.filtered = this.allNames.filter(byPattern)
+      this.results = app.scales.search(pattern)
+      this.update()
     }
-
-    function byPattern(item) {
-      return item.visible
-    }
-
   </script>
 </search>

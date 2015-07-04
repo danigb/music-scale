@@ -1,41 +1,22 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag('browser', '<div class="app"> <div class="search"> <search events="{ events }"></search> </div> <div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; }', function(opts) {
-    var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
-      'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
+riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ app }"></search> </div> <div class="scale"> <div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
     var self = this
-    this.events = riot.observable(this)
-    this.scale_name = ''
+    this.app = this.opts.app
 
     this.select = function(e) {
-      console.log('Select', e.target)
-      this.events.trigger('select', e.target.getAttribute('data-name'))
+      this.app.events.trigger('select', e.target.getAttribute('data-name'))
     }.bind(this);
 
-    this.events.on('select', function(name) {
-      self.scale = getScale(name)
+    this.app.events.on('select', function(name) {
+      self.scale = self.app.scales.get(name)
       self.update()
       document.body.scrollTop = document.documentElement.scrollTop = 0
     })
-    this.events.trigger('select', 'major')
+    this.app.events.trigger('select', 'major')
 
-    function getScale(name) {
-      var scale = Scale.get(name)
-      return scale ? {
-        name: name,
-        type: types[scale.length - 1],
-        decimal: scale.decimal,
-        binary: scale.binary,
-        altNames: scale.names().filter(function(altName) {
-          return altName !== name
-        }).join(', '),
-        modes: scale.modes().map(function (mode) {
-          return { binary: mode.binary, name: mode.name() }
-        }),
-        cannonicalName: scale.cannonicalMode().name()
-      } : null
-    }
+
   
 });
 
@@ -44,34 +25,69 @@ var riot = require('riot')
 var Scale = require('music-scale/all')
 var browser = require('./browser.tag')
 require('./search.tag')
-riot.mount(browser, { Scale: Scale })
+
+var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
+'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
+var NAMES = Scale.Names.names()
+
+var ScalesStore = {
+  names: function () {
+    return NAMES
+  },
+  search: function (pattern) {
+    pattern = pattern || ''
+    if (/^\d{4}$/.test(pattern)) {
+      var value = +pattern
+      if (value >= Scale.MIN && value <= Scale.MAX) {
+        return [ pattern ]
+      }
+    }
+    return NAMES.filter(function (name) {
+      return pattern.length === 0 || name.indexOf(pattern) >= 0
+    })
+  },
+  get: function (name) {
+    var scale = Scale.get(name)
+    return scale ? {
+      name: name,
+      type: types[scale.length - 1],
+      decimal: scale.decimal,
+      binary: scale.binary,
+      altNames: scale.names().filter(function (altName) {
+        return altName !== name
+      }).join(', '),
+      modes: scale.modes().map(function (mode) {
+        return { binary: mode.binary, name: mode.name() }
+      }),
+      cannonicalName: scale.cannonicalMode().name()
+    } : null
+  }
+}
+
+var App = function () {
+  this.events = riot.observable({})
+  this.scales = ScalesStore
+}
+
+riot.mount(browser, { app: new App() })
 
 },{"./browser.tag":1,"./search.tag":3,"music-scale/all":5,"riot":7}],3:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { filtered.length } of { allNames.length }</label> <a each="{ filtered }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
-    this.allNames = Scale.Names.names().map(function (name) {
-      return { name: name, visible: true }
-    })
-    this.filtered = this.allNames.filter(byPattern)
-    this.total = this.allNames.length
+module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of { total }</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
+    var app = this.opts.app
+    this.results = app.scales.search('')
+    this.total = app.scales.names().length
 
     this.select = function(e) {
       var name = e.target.getAttribute('data-name')
-      this.opts.events.trigger('select', name)
+      app.events.trigger('select', name)
     }.bind(this);
 
     this.search = function(e) {
       var pattern = this.pattern = e.target.value
-      this.allNames.forEach(function (item) {
-        item.visible = pattern.length === 0 || item.name.indexOf(pattern) >= 0
-      })
-      this.filtered = this.allNames.filter(byPattern)
+      this.results = app.scales.search(pattern)
+      this.update()
     }.bind(this);
-
-    function byPattern(item) {
-      return item.visible
-    }
-
   
 });
 
