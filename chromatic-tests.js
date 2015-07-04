@@ -33,9 +33,12 @@ vows.describe('Chromatic').addBatch({
     spell(Chromatic('Cb'), '')
     spell(Chromatic('C##'), '')
   },
+  'descending': function () {
+    spell(Chromatic('C', null, 13, true), 'C B Bb A Ab G Gb F E Eb D Db C')
+  },
   'with octaves': function () {
     spell(Chromatic('C', 2), 'C2 Db2 D2 Eb2 E2 F2 Gb2 G2 Ab2 A2 Bb2 B2')
-    spell(Chromatic('A', 2), 'A2 Bb2 B2 C3 Db3 D3 Eb3 E3 F3 Gb3 G3 Ab3')
+    spell(Chromatic('A', 2, 8), 'A2 Bb2 B2 C3 Db3 D3 Eb3 E3')
     spell(Chromatic('F#', 4), 'F#4 G4 G#4 A4 A#4 B4 C5 C#5 D5 D#5 E5 F5')
   },
   'normalize root': function () {

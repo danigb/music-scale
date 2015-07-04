@@ -11,7 +11,6 @@
     <div class="notes">
       <canvas id="score0" width="500" height="100"></canvas>_
       <canvas id="score1" width="500" height="100"></canvas>_
-      { scale.spell }
     </div>
 
     <h3>Modes</h3>

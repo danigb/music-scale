@@ -221,7 +221,7 @@ module.exports = riot.tag('roots', '<div class="roots"> <a each="{ roots }" clas
 
 },{"riot":16}],7:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots app="{ opts.app }" root="{ root }"></roots> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <h3>Notes</h3> <div class="notes"> <canvas id="score0" width="500" height="100"></canvas>_ <canvas id="score1" width="500" height="100"></canvas>_ { scale.spell } </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="{ mode: true, can: cannonical }"> <a href="#" onclick="{ parent.select }" data-name="{ decimal }"> { parent.state.root } { name } </a> <div each="{ binary }" class="{ digit: true, one: one, zero: !one, alt: alt }"> { digit } </div> </div> </div>', 'scale .mode, [riot-tag="scale"] .mode{ width: 100%; overflow: hidden; padding: 0.2em 0; height: 2em; } scale .mode a, [riot-tag="scale"] .mode a{ float: left; display: block; width: 12em; } scale .mode div, [riot-tag="scale"] .mode div{ float: left; overflow: hidden; text-indent: -100px; height: 1em; width: 1em; margin: 0.5em 0.1em 0.1em 0; border-radius: 1em; border: 1px solid white; } scale .mode.can, [riot-tag="scale"] .mode.can{ font-weight: bold; } scale .mode .zero, [riot-tag="scale"] .mode .zero{ background-color: #DDD; } scale .mode .alt, [riot-tag="scale"] .mode .alt{ margin-top: 0.5em; width: 1em; } scale .mode .one, [riot-tag="scale"] .mode .one{ background-color: #666; } scale .mode .one.alt, [riot-tag="scale"] .mode .one.alt{ background-color: #333; }', function(opts) {
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots app="{ opts.app }" root="{ root }"></roots> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <h3>Notes</h3> <div class="notes"> <canvas id="score0" width="500" height="100"></canvas>_ <canvas id="score1" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="{ mode: true, can: cannonical }"> <a href="#" onclick="{ parent.select }" data-name="{ decimal }"> { parent.state.root } { name } </a> <div each="{ binary }" class="{ digit: true, one: one, zero: !one, alt: alt }"> { digit } </div> </div> </div>', 'scale .mode, [riot-tag="scale"] .mode{ width: 100%; overflow: hidden; padding: 0.2em 0; height: 2em; } scale .mode a, [riot-tag="scale"] .mode a{ float: left; display: block; width: 12em; } scale .mode div, [riot-tag="scale"] .mode div{ float: left; overflow: hidden; text-indent: -100px; height: 1em; width: 1em; margin: 0.5em 0.1em 0.1em 0; border-radius: 1em; border: 1px solid white; } scale .mode.can, [riot-tag="scale"] .mode.can{ font-weight: bold; } scale .mode .zero, [riot-tag="scale"] .mode .zero{ background-color: #DDD; } scale .mode .alt, [riot-tag="scale"] .mode .alt{ margin-top: 0.5em; width: 1em; } scale .mode .one, [riot-tag="scale"] .mode .one{ background-color: #666; } scale .mode .one.alt, [riot-tag="scale"] .mode .one.alt{ background-color: #333; }', function(opts) {
     var self = this
     var app = this.opts.app
     this.state = app.state
@@ -271,13 +271,14 @@ module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search
 },{"riot":16}],9:[function(require,module,exports){
 'use strict'
 
-function Chromatic (root, octave, length) {
+function Chromatic (root, octave, length, descending) {
   if (!root) throw Error('Give me a root, please')
   root = root.charAt(0).toUpperCase() + root.slice(1).toLowerCase()
   length = length || 12
+  descending = descending === true ? 1 : 0
   return Chromatic.SCALES.reduce(function (all, notes) {
     var scale = find(root, notes)
-    if (scale) all.push(octavize(forceLength(scale, length), octave))
+    if (scale) all.push(octavize(forceLength(reverse(scale, descending), length), octave))
     return all
   }, [])
 }
@@ -302,6 +303,10 @@ Chromatic.NAMES = (function () {
 function find (root, notes) {
   var index = notes.indexOf(root)
   return index < 0 ? null : rotate(notes, index)
+}
+
+function reverse (scale, reverse) {
+  return reverse ? rotate(scale.reverse(), scale.length - 1) : scale
 }
 
 function octavize (scale, octave) {

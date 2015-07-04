@@ -1,12 +1,13 @@
 'use strict'
 
-function Chromatic (root, octave, length) {
+function Chromatic (root, octave, length, descending) {
   if (!root) throw Error('Give me a root, please')
   root = root.charAt(0).toUpperCase() + root.slice(1).toLowerCase()
   length = length || 12
+  descending = descending === true ? 1 : 0
   return Chromatic.SCALES.reduce(function (all, notes) {
     var scale = find(root, notes)
-    if (scale) all.push(octavize(forceLength(scale, length), octave))
+    if (scale) all.push(octavize(forceLength(reverse(scale, descending), length), octave))
     return all
   }, [])
 }
@@ -31,6 +32,10 @@ Chromatic.NAMES = (function () {
 function find (root, notes) {
   var index = notes.indexOf(root)
   return index < 0 ? null : rotate(notes, index)
+}
+
+function reverse (scale, reverse) {
+  return reverse ? rotate(scale.reverse(), scale.length - 1) : scale
 }
 
 function octavize (scale, octave) {
