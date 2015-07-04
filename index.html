@@ -4,7 +4,6 @@
   <head>
     <title>Scale browser</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="scales.css">
 
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.0.5/es5-shim.min.js"></script>
@@ -15,19 +14,8 @@
   </head>
 
   <body>
-    <div class="container">
-      <browser></browser>
-    </div>
-
-    <script src="music-scale-all.js"></script>
-    <script src="browser.tag" type="riot/tag"></script>
-    <script src="search.tag" type="riot/tag"></script>
-    <script src="https://cdn.jsdelivr.net/g/riot@2.0.14(riot.min.js+compiler.min.js)"></script>
-
-    <script>
-    riot.mount('browser', { key: 'value' })
-    </script>
-
+    <browser></browser>
+    <script src="browser.js"></script>
   </body>
 
 </html>

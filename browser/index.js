@@ -1,0 +1,5 @@
+var riot = require('riot')
+var Scale = require('music-scale/all')
+var browser = require('./browser.tag')
+require('./search.tag')
+riot.mount(browser, { Scale: Scale })

@@ -1,4 +1,5 @@
 <search>
+  <h4>Search scale</h4>
   <input name="searchPattern" onkeyup={ search }>
   <div class="names">
     <label>Showing { filtered.length } of { allNames.length }</label>

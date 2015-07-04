@@ -1,0 +1,40 @@
+{
+  "name": "music-scale-demos",
+  "version": "1.0.0",
+  "private": "true",
+  "description": "music-scale library demos",
+  "main": "index.html",
+  "dependencies": {
+    "method-memoize": "^1.0.0",
+    "music-scale": "^0.7.0",
+    "note-pitch": "^0.6.0",
+    "riot": "^2.2.1",
+    "vows": "^0.8.1"
+  },
+  "devDependencies": {
+    "riotify": "^0.1.2"
+  },
+  "scripts": {
+    "server": "http-server & npm run watch-browser",
+    "watch-browser": "watchify -t riotify browser/index.js -o browser.js -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danigb/music-scale.git"
+  },
+  "keywords": [
+    "music-scale",
+    "music",
+    "scale",
+    "scales",
+    "theory",
+    "midi",
+    "audio"
+  ],
+  "author": "= <=>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danigb/music-scale/issues"
+  },
+  "homepage": "https://github.com/danigb/music-scale#readme"
+}

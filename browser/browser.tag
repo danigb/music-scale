@@ -19,7 +19,8 @@
   </div>
 
   <style scoped>
-    .app { width: 100%; overflow: hidden; }
+    :scope { font-family: 'myriad pro', sans-serif; }
+    .app { width: 960px; margin: 40px auto; overflow: hidden; }
     .search { width: 33%; float: left; }
   </style>
 
