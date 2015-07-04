@@ -14,7 +14,7 @@
       </div>
       <h3>Modes</h3>
       <div each ={ scale.modes } class="modes">
-        <a>{ binary } { name }</a>
+        <a href="#" onclick={ parent.select } data-name={ binary }>{ binary } { name }</a>
     </div>
   </div>
 
@@ -30,9 +30,21 @@
     this.events = riot.observable(this)
     this.scale_name = ''
 
+    select(e) {
+      console.log('Select', e.target)
+      this.events.trigger('select', e.target.getAttribute('data-name'))
+    }
+
     this.events.on('select', function(name) {
+      self.scale = getScale(name)
+      self.update()
+      document.body.scrollTop = document.documentElement.scrollTop = 0
+    })
+    this.events.trigger('select', 'major')
+
+    function getScale(name) {
       var scale = Scale.get(name)
-      self.scale = {
+      return scale ? {
         name: name,
         type: types[scale.length - 1],
         decimal: scale.decimal,
@@ -44,9 +56,7 @@
           return { binary: mode.binary, name: mode.name() }
         }),
         cannonicalName: scale.cannonicalMode().name()
-      }
-      self.update()
-    })
-    this.events.trigger('select', 'major')
+      } : null
+    }
   </script>
 </browser>
