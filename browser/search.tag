@@ -19,8 +19,7 @@
 
   <script>
     var app = this.opts.app
-    console.log(app)
-    this.results = app.scales.search(app.state.pattern)
+    this.results = app.getResults()
     this.total = app.scales.names().length
 
     select(e) {
@@ -28,8 +27,11 @@
     }
 
     search(e) {
-      app.setPattern(e.target.value)
+      app.setPattern(this.searchPattern.value)
+      this.results = app.getResults()
       this.update()
     }
+
+    this.searchPattern.focus()
   </script>
 </search>

@@ -11,6 +11,7 @@
 
   <style scoped>
     :scope { font-family: 'myriad pro', sans-serif; }
+    .app a { color: black; }
     .app { width: 960px; margin: 40px auto; overflow: hidden; }
     .search { width: 33%; float: left; }
     .scale { margin-left: 33%; }

@@ -2,38 +2,51 @@ var Scale = require('music-scale/all')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
+
 var NAMES = Scale.Names.names()
+var all = [].concat(NAMES)
+
+function isValidPattern (pattern) {
+  return pattern &&               // present
+    !/^\s*$/.test(pattern) &&     // not empty
+    !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
 
 module.exports = {
   names: function () {
-    return NAMES
+    return all
   },
   search: function (pattern) {
-    pattern = pattern || ''
-    if (/^\d{4}$/.test(pattern)) {
-      var value = +pattern
-      if (value >= Scale.MIN && value <= Scale.MAX) {
-        return [ pattern ]
-      }
+    if (!isValidPattern(pattern)) {
+      return NAMES
+    } else {
+      if (/^[01]+$/.test(pattern)) pattern = '[' + pattern
+      return all.filter(function (name) {
+        return name.indexOf(pattern) >= 0
+      })
     }
-    return NAMES.filter(function (name) {
-      return pattern.length === 0 || name.indexOf(pattern) >= 0
-    })
   },
   get: function (name) {
+    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
     var scale = Scale.get(name)
     return scale ? {
       name: name,
       type: types[scale.length - 1],
       decimal: scale.decimal,
       binary: scale.binary,
-      altNames: scale.names().filter(function (altName) {
+      altnames: scale.names().filter(function (altName) {
         return altName !== name
       }).join(', '),
       modes: scale.modes().map(function (mode) {
         return { binary: mode.binary, name: mode.name() }
       }),
-      cannonicalName: scale.cannonicalMode().name()
+      cannonicalName: scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
     } : null
+  },
+  build: function () {
+    Scale.all().forEach(function (scale) {
+      if (scale.name()) return
+      all.push('' + scale.decimal + ' [' + scale.binary + '] ' + types[scale.length - 1])
+    })
   }
 }

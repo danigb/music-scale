@@ -1,7 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
-riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
+riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app a, [riot-tag="browser"] .app a{ color: black; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
 
 
 });
@@ -34,11 +34,18 @@ App.prototype.select = function (name) {
 App.prototype.getSelected = function () {
   return this.scales.get(this.state.selected)
 }
+App.prototype.getResults = function () {
+  return this.scales.search(this.state.pattern)
+}
 
 riot.mount(browser, { app: new App({
   pattern: '',
   selected: 'major'
 }) })
+
+setTimeout(function () {
+  ScalesStore.build()
+}, 500)
 
 },{"./browser.tag":1,"./scale.tag":3,"./search.tag":4,"./store.js":5,"riot":9}],3:[function(require,module,exports){
 var riot = require('riot');
@@ -63,8 +70,7 @@ module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Sca
 var riot = require('riot');
 module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of { total }</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
     var app = this.opts.app
-    console.log(app)
-    this.results = app.scales.search(app.state.pattern)
+    this.results = app.getResults()
     this.total = app.scales.names().length
 
     this.select = function(e) {
@@ -72,9 +78,12 @@ module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPa
     }.bind(this);
 
     this.search = function(e) {
-      app.setPattern(e.target.value)
+      app.setPattern(this.searchPattern.value)
+      this.results = app.getResults()
       this.update()
     }.bind(this);
+
+    this.searchPattern.focus()
   
 });
 
@@ -83,39 +92,52 @@ var Scale = require('music-scale/all')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
+
 var NAMES = Scale.Names.names()
+var all = [].concat(NAMES)
+
+function isValidPattern (pattern) {
+  return pattern &&               // present
+    !/^\s*$/.test(pattern) &&     // not empty
+    !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
 
 module.exports = {
   names: function () {
-    return NAMES
+    return all
   },
   search: function (pattern) {
-    pattern = pattern || ''
-    if (/^\d{4}$/.test(pattern)) {
-      var value = +pattern
-      if (value >= Scale.MIN && value <= Scale.MAX) {
-        return [ pattern ]
-      }
+    if (!isValidPattern(pattern)) {
+      return NAMES
+    } else {
+      if (/^[01]+$/.test(pattern)) pattern = '[' + pattern
+      return all.filter(function (name) {
+        return name.indexOf(pattern) >= 0
+      })
     }
-    return NAMES.filter(function (name) {
-      return pattern.length === 0 || name.indexOf(pattern) >= 0
-    })
   },
   get: function (name) {
+    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
     var scale = Scale.get(name)
     return scale ? {
       name: name,
       type: types[scale.length - 1],
       decimal: scale.decimal,
       binary: scale.binary,
-      altNames: scale.names().filter(function (altName) {
+      altnames: scale.names().filter(function (altName) {
         return altName !== name
       }).join(', '),
       modes: scale.modes().map(function (mode) {
         return { binary: mode.binary, name: mode.name() }
       }),
-      cannonicalName: scale.cannonicalMode().name()
+      cannonicalName: scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
     } : null
+  },
+  build: function () {
+    Scale.all().forEach(function (scale) {
+      if (scale.name()) return
+      all.push('' + scale.decimal + ' [' + scale.binary + '] ' + types[scale.length - 1])
+    })
   }
 }
 

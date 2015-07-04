@@ -25,8 +25,15 @@ App.prototype.select = function (name) {
 App.prototype.getSelected = function () {
   return this.scales.get(this.state.selected)
 }
+App.prototype.getResults = function () {
+  return this.scales.search(this.state.pattern)
+}
 
 riot.mount(browser, { app: new App({
   pattern: '',
   selected: 'major'
 }) })
+
+setTimeout(function () {
+  ScalesStore.build()
+}, 500)
