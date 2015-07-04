@@ -1,8 +1,9 @@
 <search>
   <h4>Search scale</h4>
+  <label>You can search by scale name, <br>decimal or equivalent binary</label>
   <input name="searchPattern" onkeyup={ search }>
   <div class="names">
-    <label>Showing { results.length } of { total }</label>
+    <label>Showing { results.length } of 2048</label>
     <a each={ name in results } data-name={ name }
       onclick={ parent.select } href="#">
       { name }
@@ -13,14 +14,13 @@
     input[name='searchPattern'] {
       font-size: 1em;
     }
-    .names label { display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; }
+    label { display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; }
     .names a { display: block; }
   </style>
 
   <script>
     var app = this.opts.app
     this.results = app.getResults()
-    this.total = app.scales.names().length
 
     select(e) {
       app.select(e.target.getAttribute('data-name'))

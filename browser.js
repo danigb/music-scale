@@ -6,7 +6,7 @@ riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.
 
 });
 
-},{"riot":9}],2:[function(require,module,exports){
+},{"riot":13}],2:[function(require,module,exports){
 var riot = require('riot')
 var ScalesStore = require('./store.js')
 
@@ -19,6 +19,7 @@ var App = function (state) {
   this.state = state
   this.events = riot.observable({})
   this.scales = ScalesStore
+  this.render = require('./render.js')
 }
 
 App.prototype.setPattern = function (pattern) {
@@ -47,12 +48,63 @@ setTimeout(function () {
   ScalesStore.build()
 }, 500)
 
-},{"./browser.tag":1,"./scale.tag":3,"./search.tag":4,"./store.js":5,"riot":9}],3:[function(require,module,exports){
+},{"./browser.tag":1,"./render.js":3,"./scale.tag":4,"./search.tag":5,"./store.js":6,"riot":13}],3:[function(require,module,exports){
+var Note = require('note-pitch')
+var VexFlow = Vex.Flow
+
+module.exports = function (canvas, width, height, scale) {
+  console.log('rendering...')
+  var renderer = new VexFlow.Renderer(canvas, VexFlow.Renderer.Backends.CANVAS)
+  var ctx = renderer.getContext()
+  ctx.fillStyle = 'white'
+  ctx.fillRect(0, 0, width, height)
+  ctx.fillStyle = 'black'
+  var stave = new VexFlow.Stave(10, 0, width)
+  stave.addClef('treble').setContext(ctx).draw()
+
+  console.log('rendering ', scale.notes)
+  var notes = scale.notes.map(function (name) {
+    var note = Note.parse(name)
+    var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/4'], duration: 'q' })
+    if (note.acc) {
+      staveNote.addAccidental(0, new VexFlow.Accidental(note.acc))
+    }
+    return staveNote
+  })
+  notes.push(new VexFlow.BarNote({
+    type: VexFlow.Barline.END
+  }))
+  var voice = new VexFlow.Voice({
+    num_beats: 4,
+    beat_value: 4,
+    resolution: VexFlow.RESOLUTION
+  })
+  voice.mode = VexFlow.Voice.Mode.SOFT
+
+  // Add notes to voice
+  voice.addTickables(notes)
+
+  // Format and justify the notes to width pixels
+  var formatter = new VexFlow.Formatter()
+  formatter.joinVoices([voice]).format([voice], width)
+
+  // Render voice
+  voice.draw(ctx, stave)
+}
+
+},{"note-pitch":10}],4:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Notes</h3> <div class="notes"> <div>{ scale.spell }</div> <canvas id="score" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
     var self = this
     var app = this.opts.app
     self.scale = app.getSelected()
+    var canvas = this.score
+    var VexFlow = typeof Vex !== 'undefined' ? Vex.Flow : null
+
+    this.on('update', function() {
+      console.log('update', canvas, VexFlow)
+      app.render(canvas, 400, 100, app.getSelected())
+    })
 
     this.select = function(e) {
       app.select(e.target.getAttribute('data-name'))
@@ -66,12 +118,11 @@ module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Sca
   
 });
 
-},{"riot":9}],4:[function(require,module,exports){
+},{"riot":13}],5:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of { total }</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search .names label, [riot-tag="search"] .names label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
+module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search by scale name, <br>decimal or equivalent binary</label> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of 2048</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search label, [riot-tag="search"] label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
     var app = this.opts.app
     this.results = app.getResults()
-    this.total = app.scales.names().length
 
     this.select = function(e) {
       app.select(e.target.getAttribute('data-name'))
@@ -87,8 +138,9 @@ module.exports = riot.tag('search', '<h4>Search scale</h4> <input name="searchPa
   
 });
 
-},{"riot":9}],5:[function(require,module,exports){
+},{"riot":13}],6:[function(require,module,exports){
 var Scale = require('music-scale/all')
+var Note = require('note-pitch')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
@@ -100,6 +152,22 @@ function isValidPattern (pattern) {
   return pattern &&               // present
     !/^\s*$/.test(pattern) &&     // not empty
     !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
+
+function scaleData (name, scale) {
+  if (!scale) return null
+  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
+  s.type = types[scale.length - 1]
+  s.altnames = scale.names().filter(function (altName) {
+    return altName !== name
+  }).join(', ')
+  s.modes = scale.modes().map(function (mode) {
+    return { binary: mode.binary, name: mode.name() }
+  })
+  s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
+  s.notes = Note.transpose('C', scale.intervals())
+  s.spell = s.notes.join(',')
+  return s
 }
 
 module.exports = {
@@ -118,20 +186,7 @@ module.exports = {
   },
   get: function (name) {
     if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
-    var scale = Scale.get(name)
-    return scale ? {
-      name: name,
-      type: types[scale.length - 1],
-      decimal: scale.decimal,
-      binary: scale.binary,
-      altnames: scale.names().filter(function (altName) {
-        return altName !== name
-      }).join(', '),
-      modes: scale.modes().map(function (mode) {
-        return { binary: mode.binary, name: mode.name() }
-      }),
-      cannonicalName: scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
-    } : null
+    return scaleData(name, Scale.get(name))
   },
   build: function () {
     Scale.all().forEach(function (scale) {
@@ -141,7 +196,7 @@ module.exports = {
   }
 }
 
-},{"music-scale/all":7}],6:[function(require,module,exports){
+},{"music-scale/all":8,"note-pitch":10}],7:[function(require,module,exports){
 module.exports = function(method) {
   var memoized = function() {
     var cache = this['__cache' + memoized.cacheId] ||
@@ -156,7 +211,7 @@ module.exports = function(method) {
   return memoized;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict'
 var Scale = require('./')
 Scale.Names({
@@ -251,7 +306,7 @@ Scale.Names({
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"./":8}],8:[function(require,module,exports){
+},{"./":9}],9:[function(require,module,exports){
 'use strict'
 
 var memoize = require('method-memoize')
@@ -470,7 +525,265 @@ function lengthOf (o) { return o.length }
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"method-memoize":6}],9:[function(require,module,exports){
+},{"method-memoize":7}],10:[function(require,module,exports){
+'use strict'
+
+var Interval = require('interval-parser')
+var parse = require('note-parser')
+
+var Note = {}
+
+Note.parse = function (note) {
+  return parse.apply(null, arguments)
+}
+
+Note.semitones = function (a, b) {
+  return parse(b).midi - parse(a).midi
+}
+
+/*
+ * pitch.distance
+ *
+ * return intervals between notes
+ */
+Note.distance = function (root, notes) {
+  root = parse(root)
+  if (arguments.length === 1) {
+    return function (note) {
+      return interval(root, note)
+    }
+  } else if (Array.isArray(notes)) {
+    return notes.map(function (i) {
+      return interval(root, i)
+    })
+  } else {
+    return interval(root, notes)
+  }
+}
+
+Note.transpose = function (note, interval) {
+  if (arguments.length === 1) {
+    interval = note
+    return function (note) {
+      return transpose(note, interval)
+    }
+  } else if (Array.isArray(interval)) {
+    return interval.map(function (i) {
+      return transpose(note, i)
+    })
+  } else {
+    return transpose(note, interval)
+  }
+}
+
+var CHANGE = {
+  'minor': ['d', 'm', 'M', 'A'],
+  'perfect': ['d', 'P', 'A']
+}
+function interval (a, b) {
+  a = parse(a)
+  b = parse(b)
+  var semitones = b.midi - a.midi
+  var dir = semitones < 0 ? -1 : 1
+  var pitchDistance = pitchDist(a, b) + dir
+  if (dir < 0) pitchDistance -= 7
+
+  var i = Interval('d' + pitchDistance)
+  var octaves = semitones / 12 | 0
+  if (octaves === -1) octaves = 0
+  var difference = dir * (semitones - i.semitones - 12 * octaves)
+  var dest = CHANGE[i.type][difference] + (pitchDistance + 7 * octaves)
+  return dest
+}
+
+function pitchDist (a, b) {
+  var first = PITCH_CLASSES.indexOf(parse(a).pc)
+  var second = PITCH_CLASSES.indexOf(parse(b).pc, first)
+  return second - first
+}
+
+var PITCH_CLASSES = 'cdefgabcdefgab'
+var ACCIDENTALS = ['bb', 'b', '', '#', '##']
+function transpose (note, interval) {
+  note = parse(note, null, null)
+  if (!note) return null;
+  interval = Interval(interval)
+  var pitchIndex = PITCH_CLASSES.indexOf(note.pc)
+  var pc = PITCH_CLASSES[pitchIndex + interval.simple - 1]
+  var dest = parse(pc + (note.oct + interval.octaves))
+  var difference = interval.semitones - (dest.midi - note.midi)
+  var reduced = difference % 12
+  var octaves = (difference - reduced) / 12
+  var accidentals = ACCIDENTALS[reduced + 2]
+  return dest.pc + accidentals + (dest.oct + octaves)
+}
+
+module.exports = Note
+
+},{"interval-parser":11,"note-parser":12}],11:[function(require,module,exports){
+'use strict';
+/*
+ * parseInterval
+ *
+ * Parse a interval and returns an object with:
+ * - name
+ * - quality
+ * - direction
+ * - number
+ * - simple
+ * - type
+ * - semitones
+ * - octaves
+ */
+var INTERVAL = /^([dmPMA])(-{0,1})(\d{1,2})$/;
+function parseInterval(interval) {
+  var obj = null;
+  if(isIntervalObj(interval)) {
+    obj = prepare(interval);
+  } else if (typeof(interval) == 'string') {
+    var m = INTERVAL.exec(interval.trim());
+    if(m) {
+      obj = prepare({name: interval, quality: m[1],
+        direction: m[2], number: m[3]});
+    }
+  }
+  return validate(interval, obj);
+}
+
+function validate(name, obj) {
+  if(obj == null) {
+    throw Error("Interval not valid: " + name);
+  }
+  return obj;
+}
+
+
+function isIntervalObj(interval) {
+  return typeof(interval.name) !== 'undefined'
+    && typeof(interval.quality) !== 'undefined'
+    && typeof(interval.direction) !== 'undefined'
+    && typeof(interval.number) !== 'undefined';
+}
+
+function prepare(i) {
+  i.number = +i.number;
+  i.direction = i.direction === '' ? 1 : -1;
+  i.octaves = i.octaves || octaves(i);
+  i.simple = i.simple || simpleNumber(i);
+  i.type = i.type || type(i);
+  i.semitones = i.semitones || semitones(i);
+  if(/A1|d1|d2/.test(i.name)) i.direction = -1;
+  return i;
+}
+
+function simpleNumber(i) {
+  if(i.number > 8) {
+    var num = (i.number - 1) % 7 + 1;
+    if (num == 1) num = 8;
+    return num;
+  } else {
+    return i.number;
+  }
+}
+
+function octaves(i) {
+  if(i.number === 1) return 0;
+  else return Math.floor((i.number - 2) / 7);
+}
+
+ var SEMITONES = {"d1": -1, "d2": 0, "d3": 2, "d4": 4, "d5": 6,
+   "d6": 7, "d7": 9, "d8": 11}
+ var EXTRA = {
+   "minor": {"d": 0, "m": 1, "M": 2, "A": 3 },
+   "perfect": {"d": 0, "P": 1, "A": 2 }
+ };
+
+function semitones(i) {
+  var semi = SEMITONES["d" + i.simple];
+  var extra = EXTRA[i.type][i.quality];
+  var oct = i.octaves * 12;
+  return i.direction * (semi + extra + oct);
+}
+
+
+function type(i) {
+  var num = i.simple;
+  if(num === 1 || num === 4 || num === 5 || num === 8) {
+    return "perfect";
+  } else {
+    return "minor";
+  }
+}
+
+if (typeof module === "object" && module.exports) module.exports = parseInterval;
+else i.parseInterval = parseInterval;
+
+},{}],12:[function(require,module,exports){
+'use strict'
+
+var NOTE = /^([a-gA-G])(#{0,2}|b{0,2})(-?[0-9]{1}|[+]{0,2}|[-]{0,2})$/
+/*
+ * parseNote
+ *
+ * @param {String} note - the note string to be parsed
+ * @return {Object} a object with the following attributes:
+ * - pc: pitchClass, the letter of the note, ALWAYS in lower case
+ * - acc: the accidentals (or '' if no accidentals)
+ * - oct: the octave as integer. By default is 4
+ */
+var parse = function (note, defaultOctave, defaultValue) {
+  var parsed, match, octave
+
+  // in scientific notation middleC is 4
+  defaultOctave = defaultOctave || 4
+  // test string against regex
+  if (typeof note === 'string' && (match = NOTE.exec(note))) {
+    // match[3] is the octave part
+    if (match[3].length > 0 && !isNaN(match[3])) {
+      octave = +match[3]
+    } else if (match[3][0] === '+') {
+      octave = defaultOctave + match[3].length
+    } else if (match[3][0] === '-') {
+      octave = defaultOctave - match[3].length
+    } else {
+      octave = defaultOctave
+    }
+    parsed = { pc: match[1].toLowerCase(),
+      acc: match[2], oct: octave }
+  } else if (typeof note.pc !== 'undefined'
+    && typeof note.acc !== 'undefined'
+    && typeof note.oct !== 'undefined') {
+    parsed = note
+  }
+
+  if (parsed) {
+    parsed.midi = parsed.midi || toMidi(parsed)
+    parsed.freq = parsed.freq || midiToFrequency(parsed.midi)
+    return parsed
+  } else if (typeof (defaultValue) !== 'undefined') {
+    return defaultValue
+  } else {
+    throw Error('Invalid note format: ' + note)
+  }
+}
+
+parse.toString = function (obj) {
+  return obj.pc + obj.acc + obj.oct
+}
+
+var SEMITONES = {c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }
+function toMidi (note) {
+  var alter = note.acc.length
+  if (note.acc[0] === 'b') alter = -1 * alter
+  return SEMITONES[note.pc] + alter + 12 * (note.oct + 1)
+}
+function midiToFrequency (note) {
+  return Math.pow(2, (note - 69) / 12) * 440
+}
+
+module.exports = parse
+
+},{}],13:[function(require,module,exports){
 /* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {

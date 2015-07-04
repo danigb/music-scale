@@ -10,6 +10,7 @@ var App = function (state) {
   this.state = state
   this.events = riot.observable({})
   this.scales = ScalesStore
+  this.render = require('./render.js')
 }
 
 App.prototype.setPattern = function (pattern) {

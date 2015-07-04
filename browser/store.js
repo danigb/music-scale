@@ -1,4 +1,5 @@
 var Scale = require('music-scale/all')
+var Note = require('note-pitch')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
@@ -10,6 +11,22 @@ function isValidPattern (pattern) {
   return pattern &&               // present
     !/^\s*$/.test(pattern) &&     // not empty
     !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
+
+function scaleData (name, scale) {
+  if (!scale) return null
+  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
+  s.type = types[scale.length - 1]
+  s.altnames = scale.names().filter(function (altName) {
+    return altName !== name
+  }).join(', ')
+  s.modes = scale.modes().map(function (mode) {
+    return { binary: mode.binary, name: mode.name() }
+  })
+  s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
+  s.notes = Note.transpose('C', scale.intervals())
+  s.spell = s.notes.join(',')
+  return s
 }
 
 module.exports = {
@@ -28,20 +45,7 @@ module.exports = {
   },
   get: function (name) {
     if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
-    var scale = Scale.get(name)
-    return scale ? {
-      name: name,
-      type: types[scale.length - 1],
-      decimal: scale.decimal,
-      binary: scale.binary,
-      altnames: scale.names().filter(function (altName) {
-        return altName !== name
-      }).join(', '),
-      modes: scale.modes().map(function (mode) {
-        return { binary: mode.binary, name: mode.name() }
-      }),
-      cannonicalName: scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
-    } : null
+    return scaleData(name, Scale.get(name))
   },
   build: function () {
     Scale.all().forEach(function (scale) {
