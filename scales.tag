@@ -9,8 +9,8 @@
     </div>
   </div>
 
-  <div class="scales">
-    <div class="{ scale: true, named: named }" each={ scales.filter(filter) } data-scale={ decimal }
+  <div class="scales" data-number="{ total }">
+    <div class="{ scale: true, named: named }" each={ scales } data-scale={ decimal }
       onclick={ parent.select }>
       { decimal }
     </div>
@@ -23,14 +23,8 @@
 
   <!-- this script tag is optional -->
   <script>
-    console.log('scale')
-    //this.scales = Scale.all().filter(function (s) { return s.length === 5 })
     this.scales = []
     this.total = 0
-
-    edit(e) {
-      this.text = e.target.value
-    }
 
     select(e) {
       if (this.display) this.display.classList.toggle('active')
@@ -40,7 +34,8 @@
     }
 
     generate(e) {
-      this.scales = Scale.all()
+      this.scales.push.apply(this.scales, Scale.all())
+      console.log(this.scales)
       this.scales.forEach(function(s) { s.named = s.name() ? true : false })
       this.total = this.scales.length
     }
