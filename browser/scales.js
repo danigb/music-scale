@@ -1,5 +1,5 @@
 var Scale = require('music-scale/all')
-var Note = require('note-pitch')
+var Chromatic = require('../chromatic.js')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']
@@ -11,6 +11,19 @@ function isValidPattern (pattern) {
   return pattern &&               // present
     !/^\s*$/.test(pattern) &&     // not empty
     !/^\d$/.test(pattern)         // if number, at least 2 digits
+}
+
+function notes (root, binary, len) {
+  var x, i
+  return Chromatic(root, 4, len).map(function (chroma) {
+    console.log("CHROMA", chroma)
+    var notes = []
+    for (x = 0; x < len; x++) {
+      i = x % 12
+      if (binary[i] === '1') notes.push(chroma[x])
+    }
+    return notes
+  })
 }
 
 var ALTS = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0]
@@ -34,9 +47,10 @@ function scaleData (name, root, scale) {
   }).join(', ')
   s.modes = scale.modes().map(modeToObject)
   s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
-  console.log('build scale', scale.intervals(), root)
-  s.notes = Note.transpose(root, scale.intervals())
-  s.spell = s.notes.join(',')
+
+  s.notes = notes(root, scale.binary, 13)
+  console.log('BUILD NOTES', s.notes[0])
+  s.spell = s.notes[0].join(',')
   return s
 }
 

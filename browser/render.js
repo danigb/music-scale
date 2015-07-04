@@ -1,8 +1,7 @@
 var Note = require('note-pitch')
 var VexFlow = Vex.Flow
 
-module.exports = function (canvas, width, height, scale) {
-  console.log('rendering...')
+module.exports = function (canvas, width, height, notes) {
   var renderer = new VexFlow.Renderer(canvas, VexFlow.Renderer.Backends.CANVAS)
   var ctx = renderer.getContext()
   ctx.fillStyle = 'white'
@@ -11,7 +10,7 @@ module.exports = function (canvas, width, height, scale) {
   var stave = new VexFlow.Stave(10, 0, width)
   stave.addClef('treble').setContext(ctx).draw()
 
-  var notes = scale.notes.map(function (name) {
+  var tickables = notes.map(function (name) {
     var note = Note.parse(name)
     var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/' + note.oct], duration: 'q' })
     if (note.acc) {
@@ -19,7 +18,7 @@ module.exports = function (canvas, width, height, scale) {
     }
     return staveNote
   })
-  notes.push(new VexFlow.BarNote({
+  tickables.push(new VexFlow.BarNote({
     type: VexFlow.Barline.END
   }))
   var voice = new VexFlow.Voice({
@@ -30,7 +29,7 @@ module.exports = function (canvas, width, height, scale) {
   voice.mode = VexFlow.Voice.Mode.SOFT
 
   // Add notes to voice
-  voice.addTickables(notes)
+  voice.addTickables(tickables)
 
   // Format and justify the notes to width pixels
   var formatter = new VexFlow.Formatter()

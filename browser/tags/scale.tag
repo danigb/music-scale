@@ -9,7 +9,9 @@
 
     <h3>Notes</h3>
     <div class="notes">
-      <canvas id="score" width="500" height="100"></canvas>_
+      <canvas id="score0" width="500" height="100"></canvas>_
+      <canvas id="score1" width="500" height="100"></canvas>_
+      { scale.spell }
     </div>
 
     <h3>Modes</h3>
@@ -42,12 +44,13 @@
     var app = this.opts.app
     this.state = app.state
     this.scale = app.getSelected()
-    var canvas = this.score
+    var canvas = [this.score0, this.score1]
     var VexFlow = typeof Vex !== 'undefined' ? Vex.Flow : null
 
     this.on('update', function() {
-      this.root = app.state.root
-      app.render(canvas, 400, 100, app.getSelected())
+      var notes = app.getSelected().notes
+      app.render(canvas[0], 400, 100, notes[0])
+      if (notes.length > 1) app.render(canvas[1], 400, 100, notes[1])
     })
 
     select(e) {
