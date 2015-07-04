@@ -126,16 +126,26 @@ function isValidPattern (pattern) {
     !/^\d$/.test(pattern)         // if number, at least 2 digits
 }
 
+var ALTS = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0]
+
+function modeToObject (mode) {
+  var name = mode.name() || '' + mode.decimal
+  var digits = mode.binary.split('').map(function (digit, index) {
+    return { digit: digit, one: digit === '1', alt: ALTS[index] === 1 }
+  })
+  return { decimal: mode.decimal, binary: digits, name: name, cannonical: mode === mode.cannonicalMode() }
+}
+
 function scaleData (name, root, scale) {
   if (!scale) return null
-  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
+  var s = { decimal: scale.decimal, binary: scale.binary }
+  if (/^\d+$/.test(name) && scale.name()) name = scale.name()
+  s.name = name
   s.type = types[scale.length - 1]
   s.altnames = scale.names().filter(function (altName) {
     return altName !== name
   }).join(', ')
-  s.modes = scale.modes().map(function (mode) {
-    return { binary: mode.binary, name: mode.name() }
-  })
+  s.modes = scale.modes().map(modeToObject)
   s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
   console.log('build scale', scale.intervals(), root)
   s.notes = Note.transpose(root, scale.intervals())
@@ -198,12 +208,11 @@ module.exports = riot.tag('roots', '<div class="roots"> <a each="{ roots }" clas
 
 },{"riot":15}],7:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <div class="properties"> <label>Cannonical: </label>{ scale.cannonicalName }<br> </div> <h3>Notes</h3> <div class="notes"> <roots app="{ opts.app }" root="{ root }"></roots> <canvas id="score" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="modes"> <a href="#" onclick="{ parent.select }" data-name="{ binary }">{ binary } { name }</a> </div>', function(opts) {
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots app="{ opts.app }" root="{ root }"></roots> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <h3>Notes</h3> <div class="notes"> <canvas id="score" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="{ mode: true, can: cannonical }"> <a href="#" onclick="{ parent.select }" data-name="{ decimal }"> { parent.state.root } { name } </a> <div each="{ binary }" class="{ digit: true, one: one, zero: !one, alt: alt }"> { digit } </div> </div> </div>', 'scale .mode, [riot-tag="scale"] .mode{ width: 100%; overflow: hidden; padding: 0.2em 0; height: 2em; } scale .mode a, [riot-tag="scale"] .mode a{ float: left; display: block; width: 12em; } scale .mode div, [riot-tag="scale"] .mode div{ float: left; overflow: hidden; text-indent: -100px; height: 1em; width: 1em; margin: 0.5em 0.1em 0.1em 0; border-radius: 1em; border: 1px solid white; } scale .mode.can, [riot-tag="scale"] .mode.can{ font-weight: bold; } scale .mode .zero, [riot-tag="scale"] .mode .zero{ background-color: #DDD; } scale .mode .alt, [riot-tag="scale"] .mode .alt{ margin-top: 0.5em; width: 1em; } scale .mode .one, [riot-tag="scale"] .mode .one{ background-color: #666; } scale .mode .one.alt, [riot-tag="scale"] .mode .one.alt{ background-color: #333; }', function(opts) {
     var self = this
     var app = this.opts.app
     this.state = app.state
     this.scale = app.getSelected()
-    this.root = app.state.root
     var canvas = this.score
     var VexFlow = typeof Vex !== 'undefined' ? Vex.Flow : null
 

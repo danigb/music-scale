@@ -13,16 +13,26 @@ function isValidPattern (pattern) {
     !/^\d$/.test(pattern)         // if number, at least 2 digits
 }
 
+var ALTS = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0]
+
+function modeToObject (mode) {
+  var name = mode.name() || '' + mode.decimal
+  var digits = mode.binary.split('').map(function (digit, index) {
+    return { digit: digit, one: digit === '1', alt: ALTS[index] === 1 }
+  })
+  return { decimal: mode.decimal, binary: digits, name: name, cannonical: mode === mode.cannonicalMode() }
+}
+
 function scaleData (name, root, scale) {
   if (!scale) return null
-  var s = { name: name, decimal: scale.decimal, binary: scale.binary }
+  var s = { decimal: scale.decimal, binary: scale.binary }
+  if (/^\d+$/.test(name) && scale.name()) name = scale.name()
+  s.name = name
   s.type = types[scale.length - 1]
   s.altnames = scale.names().filter(function (altName) {
     return altName !== name
   }).join(', ')
-  s.modes = scale.modes().map(function (mode) {
-    return { binary: mode.binary, name: mode.name() }
-  })
+  s.modes = scale.modes().map(modeToObject)
   s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
   console.log('build scale', scale.intervals(), root)
   s.notes = Note.transpose(root, scale.intervals())
