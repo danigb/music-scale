@@ -67,7 +67,6 @@ module.exports = {
     }
   },
   get: function (name, root) {
-    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
     return scaleData(name, root, Scale.get(name))
   },
   build: function () {

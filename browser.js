@@ -14,6 +14,7 @@ function App (state) {
   this.events = riot.observable({})
   this.scales = require('./scales.js')
   this.render = require('./render.js')
+  this.route = require('./router.js')(this)
 }
 
 App.prototype.getRoots = function () {
@@ -45,10 +46,9 @@ App.prototype.getResults = function () {
   return this.scales.search(this.state.pattern)
 }
 
-},{"./render.js":3,"./scales.js":4,"riot":16}],2:[function(require,module,exports){
+},{"./render.js":3,"./router.js":4,"./scales.js":5,"riot":17}],2:[function(require,module,exports){
 var riot = require('riot')
 var App = require('./app.js')
-var Scale = require('music-scale/all')
 
 // Tags
 var browser = require('./tags/browser.tag')
@@ -64,26 +64,11 @@ var app = new App({
 
 riot.mount(browser, { app: app })
 
-riot.route(function (decimal, name) {
-  var scale
-  if (decimal && name) {
-    scale = Scale.get(+decimal)
-    app.select(scale.name() || scale.decimal)
-  } else if (decimal) {
-    scale = Scale.get(+decimal)
-    riot.route('' + scale.decimal + '/' + (scale.name() || 'unknown name'))
-  } else if (name) {
-    scale = Scale.get(name)
-    riot.route('' + scale.decimal + '/' + name)
-  } else {
-  }
-})
-
 setTimeout(function () {
   app.scales.build()
 }, 500)
 
-},{"./app.js":1,"./tags/browser.tag":5,"./tags/roots.tag":6,"./tags/scale.tag":7,"./tags/search.tag":8,"music-scale/all":11,"riot":16}],3:[function(require,module,exports){
+},{"./app.js":1,"./tags/browser.tag":6,"./tags/roots.tag":7,"./tags/scale.tag":8,"./tags/search.tag":9,"riot":17}],3:[function(require,module,exports){
 var Note = require('note-pitch')
 var VexFlow = Vex.Flow
 
@@ -125,7 +110,37 @@ module.exports = function (canvas, width, height, notes) {
   voice.draw(ctx, stave)
 }
 
-},{"note-pitch":13}],4:[function(require,module,exports){
+},{"note-pitch":14}],4:[function(require,module,exports){
+var riot = require('riot')
+var Scale = require('music-scale/all')
+
+module.exports = function (app) {
+  function route (decimal, name) {
+    decimal = decimal || ''
+    var hash = '' + decimal
+    if (name) hash += '/' + name
+    riot.route(hash)
+  }
+
+  riot.route(function (decimal, name) {
+    var scale = /^\d{4}$/.test(decimal) ? Scale.get(+decimal) : null
+    if (scale) {
+      if (!/^\s*$/.test(name)) {
+        app.select(scale.name() || scale.decimal)
+      } else {
+        route(scale.decimal, scale.name() || scale.binary)
+      }
+    } else {
+      var clean = decodeURIComponent(name)
+      scale = Scale.get(clean)
+      if (scale) route(scale.decimal, name)
+    }
+  })
+
+  return route
+}
+
+},{"music-scale/all":12,"riot":17}],5:[function(require,module,exports){
 var Scale = require('music-scale/all')
 var Chromatic = require('../chromatic.js')
 
@@ -195,7 +210,6 @@ module.exports = {
     }
   },
   get: function (name, root) {
-    if (/^\d{4}\s/.test(name)) name = +name.split(' ')[0]
     return scaleData(name, root, Scale.get(name))
   },
   build: function () {
@@ -206,7 +220,7 @@ module.exports = {
   }
 }
 
-},{"../chromatic.js":9,"music-scale/all":11}],5:[function(require,module,exports){
+},{"../chromatic.js":10,"music-scale/all":12}],6:[function(require,module,exports){
 var riot = require('riot');
 module.exports = 
 riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.app }"></search> </div> <div class="scale"> <scale app="{ opts.app }"></scale> </div> </div>', 'browser , [riot-tag="browser"] { font-family: \'myriad pro\', sans-serif; } browser .app a, [riot-tag="browser"] .app a{ color: black; } browser .app, [riot-tag="browser"] .app{ width: 960px; margin: 40px auto; overflow: hidden; } browser .search, [riot-tag="browser"] .search{ width: 33%; float: left; } browser .scale, [riot-tag="browser"] .scale{ margin-left: 33%; }', function(opts) {
@@ -214,7 +228,7 @@ riot.tag('browser', '<div class="app"> <div class="search"> <search app="{ opts.
 
 });
 
-},{"riot":16}],6:[function(require,module,exports){
+},{"riot":17}],7:[function(require,module,exports){
 var riot = require('riot');
 module.exports = riot.tag('roots', '<div class="roots"> <a each="{ roots }" class="{ root: true, selected: selected }" href="#" onclick="{ parent.selected }"> { name } </a> </div>', 'roots .roots, [riot-tag="roots"] .roots{ width: 100%; overflow: hidden; } roots .roots a, [riot-tag="roots"] .roots a{ display: block; float: left; text-decoration: none; padding: 0.2em 0.5em 0 0.5em; border: 1px solid black; margin-right: 0.2em; } roots .roots a.selected, [riot-tag="roots"] .roots a.selected{ background-color: yellow; }', function(opts) {
     var self = this
@@ -232,9 +246,9 @@ module.exports = riot.tag('roots', '<div class="roots"> <a each="{ roots }" clas
   
 });
 
-},{"riot":16}],7:[function(require,module,exports){
+},{"riot":17}],8:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots app="{ opts.app }" root="{ root }"></roots> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <h3>Notes</h3> <div class="notes"> <canvas id="score0" width="500" height="100"></canvas>_ <canvas id="score1" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="{ mode: true, can: cannonical }"> <a href="#" onclick="{ parent.select }" data-name="{ decimal }"> { parent.state.root } { name } </a> <div each="{ binary }" class="{ digit: true, one: one, zero: !one, alt: alt }"> { digit } </div> </div> </div>', 'scale .mode, [riot-tag="scale"] .mode{ width: 100%; overflow: hidden; padding: 0.2em 0; height: 2em; } scale .mode a, [riot-tag="scale"] .mode a{ float: left; display: block; width: 12em; } scale .mode div, [riot-tag="scale"] .mode div{ float: left; overflow: hidden; text-indent: -100px; height: 1em; width: 1em; margin: 0.5em 0.1em 0.1em 0; border-radius: 1em; border: 1px solid white; } scale .mode.can, [riot-tag="scale"] .mode.can{ font-weight: bold; } scale .mode .zero, [riot-tag="scale"] .mode .zero{ background-color: #DDD; } scale .mode .alt, [riot-tag="scale"] .mode .alt{ margin-top: 0.5em; width: 1em; } scale .mode .one, [riot-tag="scale"] .mode .one{ background-color: #666; } scale .mode .one.alt, [riot-tag="scale"] .mode .one.alt{ background-color: #333; }', function(opts) {
+module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots app="{ opts.app }" root="{ root }"></roots> <h2>Scale: { state.root } { scale.name } <small if="{ scale.altNames }">({ scale.altNames })</small> </h2> <h4>[{ scale.decimal }] { scale.binary } { scale.type }</h4> <h3>Notes</h3> <div class="notes"> <canvas id="score0" width="500" height="100"></canvas>_ <canvas id="score1" width="500" height="100"></canvas>_ </div> <h3>Modes</h3> <div each ="{ scale.modes }" class="{ mode: true, can: cannonical }"> <a href="#{ decimal }/{ name }"> { parent.state.root } { name } </a> <div each="{ binary }" class="{ digit: true, one: one, zero: !one, alt: alt }"> { digit } </div> </div> </div>', 'scale .mode, [riot-tag="scale"] .mode{ width: 100%; overflow: hidden; padding: 0.2em 0; height: 2em; } scale .mode a, [riot-tag="scale"] .mode a{ float: left; display: block; width: 12em; } scale .mode div, [riot-tag="scale"] .mode div{ float: left; overflow: hidden; text-indent: -100px; height: 1em; width: 1em; margin: 0.5em 0.1em 0.1em 0; border-radius: 1em; border: 1px solid white; } scale .mode.can, [riot-tag="scale"] .mode.can{ font-weight: bold; } scale .mode .zero, [riot-tag="scale"] .mode .zero{ background-color: #DDD; } scale .mode .alt, [riot-tag="scale"] .mode .alt{ margin-top: 0.5em; width: 1em; } scale .mode .one, [riot-tag="scale"] .mode .one{ background-color: #666; } scale .mode .one.alt, [riot-tag="scale"] .mode .one.alt{ background-color: #333; }', function(opts) {
     var self = this
     var app = this.opts.app
     this.state = app.state
@@ -261,14 +275,16 @@ module.exports = riot.tag('scale', '<div if="{ scale }" class="details"> <roots 
   
 });
 
-},{"riot":16}],8:[function(require,module,exports){
+},{"riot":17}],9:[function(require,module,exports){
 var riot = require('riot');
 module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search by scale name, <br>decimal or equivalent binary</label> <input name="searchPattern" onkeyup="{ search }"> <div class="names"> <label>Showing { results.length } of 2048</label> <a each="{ name in results }" data-name="{ name }" onclick="{ parent.select }" href="#"> { name } </a>&nbsp; </div>', 'search input[name=\'searchPattern\'], [riot-tag="search"] input[name=\'searchPattern\']{ font-size: 1em; } search label, [riot-tag="search"] label{ display: block; font-size: 0.8em; margin: 0.5em 0 1em 0; } search .names a, [riot-tag="search"] .names a{ display: block; }', function(opts) {
     var app = this.opts.app
     this.results = app.getResults()
 
     this.select = function(e) {
-      app.select(e.target.getAttribute('data-name'))
+      var name = e.target.getAttribute('data-name')
+      if (/^\d{4}\s/.test(name)) app.route(+name.split(' ')[0])
+      else app.route(null, name)
     }.bind(this);
 
     this.search = function(e) {
@@ -281,7 +297,7 @@ module.exports = riot.tag('search', '<h4>Search scale</h4> <label>You can search
   
 });
 
-},{"riot":16}],9:[function(require,module,exports){
+},{"riot":17}],10:[function(require,module,exports){
 'use strict'
 
 function Chromatic (root, octave, length, descending) {
@@ -346,7 +362,7 @@ function rotate (arr, positions) {
 
 module.exports = Chromatic
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = function(method) {
   var memoized = function() {
     var cache = this['__cache' + memoized.cacheId] ||
@@ -361,7 +377,7 @@ module.exports = function(method) {
   return memoized;
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict'
 var Scale = require('./')
 Scale.Names({
@@ -456,7 +472,7 @@ Scale.Names({
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"./":12}],12:[function(require,module,exports){
+},{"./":13}],13:[function(require,module,exports){
 'use strict'
 
 var memoize = require('method-memoize')
@@ -675,7 +691,7 @@ function lengthOf (o) { return o.length }
 if (typeof module === 'object' && module.exports) module.exports = Scale
 if (typeof window !== 'undefined') window.Scale = Scale
 
-},{"method-memoize":10}],13:[function(require,module,exports){
+},{"method-memoize":11}],14:[function(require,module,exports){
 'use strict'
 
 var Interval = require('interval-parser')
@@ -773,7 +789,7 @@ function transpose (note, interval) {
 
 module.exports = Note
 
-},{"interval-parser":14,"note-parser":15}],14:[function(require,module,exports){
+},{"interval-parser":15,"note-parser":16}],15:[function(require,module,exports){
 'use strict';
 /*
  * parseInterval
@@ -871,7 +887,7 @@ function type(i) {
 if (typeof module === "object" && module.exports) module.exports = parseInterval;
 else i.parseInterval = parseInterval;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict'
 
 var NOTE = /^([a-gA-G])(#{0,2}|b{0,2})(-?[0-9]{1}|[+]{0,2}|[-]{0,2})$/
@@ -936,7 +952,7 @@ function midiToFrequency (note) {
 
 module.exports = parse
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {

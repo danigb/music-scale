@@ -23,7 +23,9 @@
     this.results = app.getResults()
 
     select(e) {
-      app.select(e.target.getAttribute('data-name'))
+      var name = e.target.getAttribute('data-name')
+      if (/^\d{4}\s/.test(name)) app.route(+name.split(' ')[0])
+      else app.route(null, name)
     }
 
     search(e) {

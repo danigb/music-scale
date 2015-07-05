@@ -13,6 +13,7 @@ function App (state) {
   this.events = riot.observable({})
   this.scales = require('./scales.js')
   this.render = require('./render.js')
+  this.route = require('./router.js')(this)
 }
 
 App.prototype.getRoots = function () {

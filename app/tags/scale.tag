@@ -15,7 +15,7 @@
 
     <h3>Modes</h3>
     <div each ={ scale.modes } class={ mode: true, can: cannonical }>
-      <a href="#" onclick={ parent.select } data-name={ decimal }>
+      <a href="#{ decimal }/{ name }">
         { parent.state.root } { name }
       </a>
       <div each={ binary } class={ digit: true, one: one, zero: !one, alt: alt }>
