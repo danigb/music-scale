@@ -16,7 +16,6 @@ function isValidPattern (pattern) {
 function notes (root, binary, len) {
   var x, i
   return Chromatic(root, 4, len).map(function (chroma) {
-    console.log("CHROMA", chroma)
     var notes = []
     for (x = 0; x < len; x++) {
       i = x % 12
@@ -49,7 +48,6 @@ function scaleData (name, root, scale) {
   s.cannonicalName = scale.cannonicalMode().name() || '' + scale.cannonicalMode().decimal
 
   s.notes = notes(root, scale.binary, 13)
-  console.log('BUILD NOTES', s.notes[0])
   s.spell = s.notes[0].join(',')
   return s
 }

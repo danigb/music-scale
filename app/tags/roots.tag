@@ -22,7 +22,6 @@
 
     app.events.on('select', function() {
       self.roots = app.getRoots()
-      console.log('roots selected', self.roots)
       self.update()
     })
 

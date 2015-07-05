@@ -16,7 +16,7 @@
   },
   "scripts": {
     "server": "http-server & npm run watch-browser",
-    "watch-browser": "watchify -t riotify browser/index.js -o browser.js -v"
+    "watch-browser": "watchify -t riotify app/index.js -o browser.js -v"
   },
   "repository": {
     "type": "git",
