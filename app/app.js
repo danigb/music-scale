@@ -14,6 +14,7 @@ function App (state) {
   this.scales = require('./scales.js')
   this.render = require('./render.js')
   this.route = require('./router.js')(this)
+  this.play = require('./player.js')
 }
 
 App.prototype.getRoots = function () {

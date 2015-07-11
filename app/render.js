@@ -1,4 +1,4 @@
-var Note = require('note-pitch')
+var parse = require('note-parser')
 var VexFlow = Vex.Flow
 
 module.exports = function (canvas, width, height, notes) {
@@ -11,7 +11,7 @@ module.exports = function (canvas, width, height, notes) {
   stave.addClef('treble').setContext(ctx).draw()
 
   var tickables = notes.map(function (name) {
-    var note = Note.parse(name)
+    var note = parse(name)
     var staveNote = new VexFlow.StaveNote({ keys: [note.pc + note.acc + '/' + note.oct], duration: 'q' })
     if (note.acc) {
       staveNote.addAccidental(0, new VexFlow.Accidental(note.acc))

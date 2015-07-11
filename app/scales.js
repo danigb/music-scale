@@ -1,5 +1,5 @@
 var Scale = require('music-scale/all')
-var Chromatic = require('../chromatic.js')
+var Chromatic = require('chromatic')
 
 var types = ['one note', 'interval', 'triad', 'cuatriad', 'pentatonic',
 'hexatonic', 'heptatonic', 'octatonic', '9 notes', '10 notes', '11 notes', '12 notes']

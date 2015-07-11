@@ -5,10 +5,13 @@
   "description": "music-scale library demos",
   "main": "index.html",
   "dependencies": {
+    "andante": "^0.1.0",
+    "chromatic": "^0.1.0",
     "method-memoize": "^1.0.0",
     "music-scale": "^0.7.0",
-    "note-pitch": "^0.6.0",
+    "note-parser": "^0.9.0",
     "riot": "^2.2.1",
+    "soundfont-player": "^0.4.0",
     "vows": "^0.8.1"
   },
   "devDependencies": {
@@ -16,6 +19,7 @@
   },
   "scripts": {
     "server": "http-server & npm run watch-browser",
+    "build": "browserify -t riotify app/index.js -v > browser.js",
     "watch-browser": "watchify -t riotify app/index.js -o browser.js -v"
   },
   "repository": {

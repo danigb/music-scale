@@ -13,9 +13,10 @@ module.exports = function (app) {
     var scale = /^\d{4}$/.test(decimal) ? Scale.get(+decimal) : null
     if (scale) {
       if (!/^\s*$/.test(name)) {
-        app.select(scale.name() || scale.decimal)
+        name = (name in scale.names()) ? name : scale.name()
+        app.select(name || scale.decimal)
       } else {
-        route(scale.decimal, scale.name() || scale.binary)
+        route(scale.decimal, scale.name() || scale.binary)
       }
     } else {
       var clean = decodeURIComponent(name)

@@ -15,6 +15,10 @@ var app = new App({
 
 riot.mount(browser, { app: app })
 
+var route = window.location.hash || '2773/major'
+window.location.hash = ''
+app.route(route)
+
 setTimeout(function () {
   app.scales.build()
 }, 500)

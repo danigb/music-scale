@@ -12,6 +12,7 @@
       <canvas id="score0" width="500" height="100"></canvas>_
       <canvas id="score1" width="500" height="100"></canvas>_
     </div>
+    <a href="#" onclick={ play }>Play</a>
 
     <h3>Modes</h3>
     <div each ={ scale.modes } class={ mode: true, can: cannonical }>
@@ -51,6 +52,12 @@
       app.render(canvas[0], 400, 100, notes[0])
       if (notes.length > 1) app.render(canvas[1], 400, 100, notes[1])
     })
+
+    play(e) {
+      var notes = app.getSelected().notes[0]
+      console.log(notes)
+      app.play(notes)
+    }
 
     select(e) {
       app.select(e.target.getAttribute('data-name'))

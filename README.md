@@ -1,4 +1,4 @@
-# music-scale demos
+# scales
 
 Demo app for music-scale library using riotjs
 
@@ -15,4 +15,4 @@ Run server: `npm run server` and visit http://locahost:8080
 
 ## License
 
-It's just a demo... but MIT if you need it
+MIT
