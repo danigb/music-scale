@@ -1,5 +1,7 @@
 # music-scale
 
+## Deprecated: use github.com/danigb/tonal
+
 Create (western, well tempered) musical scales with javascript:
 
 ```js
