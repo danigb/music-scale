@@ -1,5 +1,9 @@
 # music-scale
 
+[![Build Status](https://travis-ci.org/danigb/music-scale.svg?branch=master)](https://travis-ci.org/danigb/music-scale)
+[![Code Climate](https://codeclimate.com/github/danigb/music-scale/badges/gpa.svg)](https://codeclimate.com/github/danigb/music-scale)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
+
 Music scales made easy:
 
 ```js
