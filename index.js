@@ -47,7 +47,7 @@ function scale (src, tonic) {
 /**
  * Build a scale using a name from a dictionary
  *
- * Normally you'll want to use this function partially applied.
+ * Normally you'll want to use this function partially applied (see example)
  *
  * @param {Hash} dictionary - a dictionary to map names to intervals (or notes)
  * @param {Hash} aliases - an (optional, can be null) dictionary that maps names to names
@@ -55,8 +55,8 @@ function scale (src, tonic) {
  * @param {String} tonic - the scale tonic
  *
  * @example
- * var data = require('music-scale/all-scales.json')
- * var aliases = require('music-scale/scale-aliases.json')
+ * var data = require('music-scale/scales.json')
+ * var aliases = require('music-scale/aliases.json')
  * var scales = scale.fromName(data, aliases)
  * scales('kumoi', 'G') // => ['G', 'A', 'Bb', 'D', 'E']
  */

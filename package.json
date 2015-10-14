@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vows --spec test/*.js",
     "docs": "docme README.md",
+    "dist": "browserify index.js > ./dist/music-scales.js",
     "coverage": "istanbul cover test/tests.js"
   },
   "repository": {

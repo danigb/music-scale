@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/danigb/music-scale.svg?branch=master)](https://travis-ci.org/danigb/music-scale)
 [![Code Climate](https://codeclimate.com/github/danigb/music-scale/badges/gpa.svg)](https://codeclimate.com/github/danigb/music-scale)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
-[![npm version](https://badge.fury.io/js/music-scale.png)](https://badge.fury.io/js/music-scale)
+[![npm version](https://badge.fury.io/js/music-scale.svg)](https://badge.fury.io/js/music-scale)
 
 Music scales made easy:
 
@@ -15,7 +15,13 @@ major('A') // => ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#']
 
 ## Install
 
-Install via npm: `npm i --save music-scale` and require it. For browsers use browserify, webpack or a similar tool.
+#### Node
+
+Install via npm: `npm i --save music-scale` and require it.
+
+#### Browsers
+
+Currently there's no distribution for browsers, but is planned. You can use browserify, webpack or a similar tool to create one.
 
 ## Usage
 
