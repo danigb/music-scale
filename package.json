@@ -2,9 +2,11 @@
   "name": "music-scale",
   "version": "0.7.0",
   "description": "Music scales implemented with binary numbers",
-  "main": "scale.js",
+  "main": "index.js",
   "scripts": {
-    "test": "vows test/*.js"
+    "test": "vows --spec test/*.js",
+    "docs": "docme README.md",
+    "coverage": "istanbul cover test/tests.js"
   },
   "repository": {
     "type": "git",
@@ -26,10 +28,11 @@
   },
   "homepage": "https://github.com/danigb/music-scale#readme",
   "devDependencies": {
-    "note-pitch": "^0.6.0",
     "vows": "^0.8.1"
   },
   "dependencies": {
-    "method-memoize": "^1.0.0"
+    "interval-parser": "^0.10.0",
+    "pitch-parser": "^0.1.0",
+    "pitch-transpose": "^0.1.0"
   }
 }
