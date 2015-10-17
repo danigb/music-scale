@@ -2,6 +2,11 @@ CHANGELOG
 
 [Master]
 
+[0.9.0 not yet released]
+- Add two sugar functions: fromName and names
+- Replace fromName with dictionary
+- Move dictionaries to its own directory
+
 [0.8.0]
 - First functional version
 - Full rewrite (based on tonal)
