@@ -2,6 +2,9 @@ CHANGELOG
 
 [Master]
 
+[0.10.0]
+- Add degrees function
+
 [0.9.0]
 - Add two sugar functions: fromName and names
 - Replace fromName with dictionary

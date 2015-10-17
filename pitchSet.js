@@ -6,7 +6,7 @@ var op = require('pitch-op')
 var isArray = Array.isArray
 
 function parse (i) { return isArray(i) ? i : (asPitch.parse(i) || asInterval.parse(i)) }
-function simplify (i) { return [i[0], i[1], 0] }
+function simplify (i) { return i ? [i[0], i[1], 0] : null }
 function normalize (arr) {
   var first = [arr[0][0], arr[0][1], null]
   return arr.map(function (i) { return op.subtract(first, i) })
