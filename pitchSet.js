@@ -12,7 +12,7 @@ function normalize (arr) {
   return arr.map(function (i) { return op.subtract(first, i) })
 }
 
-/**
+/*
  * Get a pitch set from a list of notes or intervals
  * @api private
  */

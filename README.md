@@ -9,11 +9,12 @@ Music scales made easy:
 
 ```js
 var scale = require('music-scale')
-var major = scale('1 2 3 4 5 6 7')
-major('A') // => ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#']
+scale('1 2 3 4 5 6 7', 'A') // => ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#']
+var dorian = scale('1 2 3b 4 5 6 7')
+dorian('C') // => ['C', 'D', 'Eb', 'F', 'G', 'A', 'B']
 ```
 
-With a full scale dictionary:
+Includes a dictionary of more than 100 scales:
 
 ```js
 scale.fromName('lydian augmented', 'C') // => ['C', 'D', 'E', 'F#', 'G#', 'A', 'B']
@@ -136,9 +137,9 @@ Sugestions welcomed. Pull request are perfect.
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/fromName.js">fromName.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/fromName.js">fromName.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/fromName.js#L5">lineno 5</a>
+<a href="https://github.com/danigb/music-scale/blob/master/fromName.js#L5">lineno 5</a>
 </li>
 </ul></dd>
 </dl>
@@ -188,9 +189,9 @@ a scale (array). It can be partially applied.</p>
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/dictionary.js">dictionary.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/dictionary.js">dictionary.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/dictionary.js#L31">lineno 31</a>
+<a href="https://github.com/danigb/music-scale/blob/master/dictionary.js#L31">lineno 31</a>
 </li>
 </ul></dd>
 </dl>
@@ -212,24 +213,6 @@ scales('major', 'C') // => ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 scales('aeolian', 'A') // => ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 var minor = scales('minor')
 minor('D') // => ['D', 'E', 'F', 'G', 'A', 'Bb', 'C']</code></pre>
-</dd>
-<dt>
-<h4 class="name" id="pitchSet"><span class="type-signature"></span>pitchSet<span class="signature">()</span><span class="type-signature"></span></h4>
-</dt>
-<dd>
-<div class="description">
-<p>Get a pitch set from a list of notes or intervals</p>
-</div>
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source"><ul class="dummy">
-<li>
-<a href="https://github.com/danigb/music-scale/blob/next/pitchSet.js">pitchSet.js</a>
-<span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/pitchSet.js#L19">lineno 19</a>
-</li>
-</ul></dd>
-</dl>
 </dd>
 <dt>
 <h4 class="name" id="scale"><span class="type-signature"></span>scale<span class="signature">(source, tonic)</span><span class="type-signature"> &rarr; {Array}</span></h4>
@@ -272,9 +255,9 @@ one parameter instead of two (see example)</p>
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/scale.js">scale.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/scale.js">scale.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/scale.js#L25">lineno 25</a>
+<a href="https://github.com/danigb/music-scale/blob/master/scale.js#L25">lineno 25</a>
 </li>
 </ul></dd>
 </dl>
