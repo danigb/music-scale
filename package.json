@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/danigb/music-scale#readme",
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "vows": "^0.8.1"
   },
   "dependencies": {

@@ -9,17 +9,16 @@ Music scales made easy:
 
 ```js
 var scale = require('music-scale')
-scale('1 2 3 4 5 6 7', 'A') // => ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#']
-var dorian = scale('1 2 3b 4 5 6 7')
-dorian('C') // => ['C', 'D', 'Eb', 'F', 'G', 'A', 'B']
+var major = scale('1 2 3 4 5 6 7')
+major('A') // => ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#']
 ```
 
-Includes a dictionary of more than 100 scales:
+It includes a dictionary with more than 100 scales:
 
 ```js
-scale.fromName('lydian augmented', 'C') // => ['C', 'D', 'E', 'F#', 'G#', 'A', 'B']
+var lydianAug = scale.fromName('lydian augmented')
+lydianAug('C') // => ['C', 'D', 'E', 'F#', 'G#', 'A', 'B']
 ```
-
 
 ## Install
 
@@ -41,7 +40,7 @@ _For webpack users: If you use the .json files (or any function that consumes th
 The simplest use case is build scales from intervals:
 
 ```js
-scale('1M 2M 3m 7m', 'F') // => ['F', 'G', 'Ab', 'Eb'º]
+scale('1M 2M 3m 7m', 'F') // => ['F', 'G', 'Ab', 'Eb']
 scale('1 2 3 4 5', 'A3') // => ['A3', 'B3', 'C#4', 'D4', 'E4']
 ```
 
@@ -81,7 +80,7 @@ scale('dorian', 'C') // => null
 
 #### Use the built-in scale dictionary
 
-`music-scale` comes with a dictionary of more than 100 scales:
+`music-scale` has a couple of .json data hash with about 100 scales (see [dict](https://github.com/danigb/music-scale/tree/master/dict) directory):
 
 ```js
 scale.fromName('bebop locrian', 'C') // => [ 'C', 'Db', 'Eb', 'F', 'Gb', 'G', 'Ab', 'Bb']
