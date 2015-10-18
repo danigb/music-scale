@@ -1,8 +1,8 @@
 'use strict'
 
 var curry = require('curry')
-var pitchSet = require('./pitchSet')
-var transpose = require('pitch-transpose')
+var gamut = require('./gamut')
+var scale = require('./scale')
 
 function mapValues (hash, fn) {
   return Object.keys(hash).reduce(function (data, name) {
@@ -30,13 +30,13 @@ function mapValues (hash, fn) {
  */
 function dictionary (hash, alias) {
   var data = mapValues(hash, function (src) {
-    return pitchSet(src)
+    return gamut.set(src)
   })
   alias = alias || {}
 
   return curry(function (name, tonic) {
     var intervals = data[name] || data[alias[name]] || []
-    return intervals.map(transpose(tonic))
+    return scale(intervals, tonic)
   })
 }
 

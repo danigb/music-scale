@@ -1,9 +1,7 @@
 'use strict'
 
-var pitchSet = require('./pitchSet')
+var gamut = require('./gamut')
 var scale = require('./scale')
-
-function toArray (src) { return Array.isArray(src) ? src : src.split(/\s+/) }
 
 function find (pitchNum, array) {
   for (var i = 0, len = array.length; i < len; i++) {
@@ -29,9 +27,9 @@ function find (pitchNum, array) {
  * scale.degrees('1 2 6', 'C D E F G') // => [ 'C', 'D', null ]
  */
 function degrees (degrees, notes) {
-  var tonic = toArray(notes)[0]
-  var set = pitchSet(notes)
-  var numbers = toArray(degrees).map(function (i) { return +i - 1 })
+  var tonic = gamut.asArray(notes)[0]
+  var set = gamut.set(notes)
+  var numbers = gamut.asArray(degrees).map(function (i) { return +i - 1 })
   var selected = numbers.map(function (num) {
     return find(num, set)
   })

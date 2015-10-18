@@ -1,8 +1,8 @@
 'use strict'
 
 var curry = require('curry')
-var transpose = require('pitch-transpose')
-var pitchSet = require('./pitchSet')
+var gamut = require('./gamut')
+var transpose = gamut.notes(gamut.add)
 
 /**
  * Build a scale from a source and a tonic
@@ -23,7 +23,8 @@ var pitchSet = require('./pitchSet')
  * dorian('C4')
  */
 function scale (src, tonic) {
-  return pitchSet(src).map(transpose(tonic))
+  var intervals = gamut.set(src)
+  return tonic ? transpose(tonic, intervals) : gamut.intervals(intervals)
 }
 
 module.exports = curry(scale)
