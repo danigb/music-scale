@@ -2,6 +2,9 @@ CHANGELOG
 
 [Master]
 
+[0.11.0]
+- The scales are now sorted by freq
+
 [0.10.0]
 - Add degrees function
 

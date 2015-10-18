@@ -1,7 +1,7 @@
 'use strict'
 
 var gamut = require('./gamut')
-var scale = require('./scale')
+var transpose = gamut.notes(gamut.add)
 
 function find (pitchNum, array) {
   for (var i = 0, len = array.length; i < len; i++) {
@@ -33,7 +33,7 @@ function degrees (degrees, notes) {
   var selected = numbers.map(function (num) {
     return find(num, set)
   })
-  return scale(selected, tonic)
+  return transpose(tonic, selected)
 }
 
 module.exports = degrees

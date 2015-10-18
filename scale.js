@@ -5,10 +5,11 @@ var gamut = require('./gamut')
 var transpose = gamut.notes(gamut.add)
 
 /**
- * Build a scale from a source and a tonic
+ * Build a scale from a source and a tonic. A scale is an array of notes (or
+ * intervals if tonic is null) ordered by frequency
  *
  * A source can be a list of intervals or notes. The tonic must be
- * a pitch (with or without octave)
+ * a pitch (with or without octave) or null to get the scale intervals
  *
  * This function is currified, so you can partially apply the function passing
  * one parameter instead of two (see example)

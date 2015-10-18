@@ -19,11 +19,16 @@ vows.describe('gamut').addBatch({
     assert.deepEqual(transpose('2M', 'C D E'), [ 'D', 'E', 'F#' ])
   },
   'set': {
-    'intervalSet': function () {
-      assert.deepEqual(gamut.intervals(gamut.set('C2 D3 E4')), ['1P', '2M', '3M'])
+    'set to octave 0': function () {
+      assert.deepEqual(gamut.notes(gamut.set('1 2 3')), ['C0', 'D0', 'E0'])
+      assert.deepEqual(gamut.notes(gamut.set('8 9 10')), ['C0', 'D0', 'E0'])
+      assert.deepEqual(gamut.notes(gamut.set('C2 D3 E4')), ['C0', 'D0', 'E0'])
     },
-    'pitchSet': function () {
-      assert.deepEqual(gamut.pitchClass(gamut.set('C2 D3 E4')), ['C', 'D', 'E'])
+    'remove duplicates': function () {
+      assert.deepEqual(gamut.notes(gamut.set('1 1 2 2 3 3')), ['C0', 'D0', 'E0'])
+    },
+    'order by frequency': function () {
+      assert.deepEqual(gamut.notes(gamut.set('1 3 2')), ['C0', 'D0', 'E0'])
     }
   },
   'classes': {
@@ -38,6 +43,11 @@ vows.describe('gamut').addBatch({
     },
     'get intervals': function () {
       assert.deepEqual(gamut.intervals('C D E'), [ '1P', '2M', '3M' ])
+    }
+  },
+  'uniq': {
+    'remove duplicates': function () {
+      assert.deepEqual(gamut.notes(gamut.uniq('C D C e g d c c4')), ['C', 'D', 'E', 'G', 'C4'])
     }
   }
 }).export(module)

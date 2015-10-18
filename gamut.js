@@ -7,9 +7,6 @@ var operator = require('pitch-op')
 // separator pattern to convert a list string to an array
 var SEP = /\s*\|\s*|\s*,\s*|\s+/
 var isArray = Array.isArray
-function asPitchArray (i) { return isArray(i) ? i : (asPitch(i) || asInterval(i)) }
-function semitones (i) { return i[0] + i[1] + 12 * i[2] }
-function comparator (a, b) { return semitones(a) - semitones(b) }
 
 /**
  * Gamut
@@ -76,6 +73,7 @@ function map (fn, src) {
 }
 gamut.map = map
 
+function asPitchArray (i) { return isArray(i) ? i : (asPitch(i) || asInterval(i)) }
 /**
  * Convert a list of notes or intervals to a-pitch format
  *
@@ -173,12 +171,38 @@ function normalize (arr) {
   var first = [arr[0][0], arr[0][1], null]
   return arr.map(function (i) { return i ? operator.subtract(first, i) : null })
 }
+
+/**
+ * Remove duplicates from a gamut
+ */
+function uniq (source) {
+  source = parse(source)
+  var semitones = source.map(pitchHeight)
+  return source.reduce(function (uniq, current, currentIndex) {
+    var index = semitones.indexOf(pitchHeight(current))
+    if (index === currentIndex) uniq.push(current)
+    return uniq
+  }, [])
+}
+gamut.uniq = uniq
+
 /**
  * Get a set
  */
 function set (source) {
-  return simplify(normalize(parse(source)))
+  return uniq(sort(simplify(normalize(parse(source)))))
 }
 gamut.set = set
+
+var SEMITONES = [0, 2, 4, 5, 7, 9, 11]
+function pitchHeight (i) { return i ? SEMITONES[i[0] % 7] + i[1] + 12 * i[2] : null }
+function comparator (a, b) { return pitchHeight(a) - pitchHeight(b) }
+/**
+ * Sort a gamut by frequency
+ */
+function sort (source) {
+  return parse(source).sort(comparator)
+}
+gamut.sort = sort
 
 module.exports = gamut
