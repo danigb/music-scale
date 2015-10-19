@@ -2,6 +2,9 @@ CHANGELOG
 
 [next]
 
+[0.12.0]
+- No depends on music-gamut to tranform pitches and intervals
+
 [0.11.0]
 - The scales are now sorted by freq
 
@@ -22,6 +25,7 @@ CHANGELOG
 
 
 BENCHMARKS
+[0.12.0] build scale x 52,723 ops/sec ±3.41% (89 runs sampled)
 [0.11.0] build scale x 54,052 ops/sec ±0.60% (98 runs sampled)
 [0.10.0] build scale x 70,716 ops/sec ±0.50% (101 runs sampled)
 

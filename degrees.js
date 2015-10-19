@@ -1,7 +1,7 @@
 'use strict'
 
-var gamut = require('./gamut')
-var transpose = gamut.notes(gamut.add)
+var gamut = require('music-gamut')
+var transpose = gamut.asNotes(gamut.add)
 
 function find (pitchNum, array) {
   for (var i = 0, len = array.length; i < len; i++) {

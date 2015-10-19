@@ -1,7 +1,7 @@
 'use strict'
 
 var curry = require('curry')
-var gamut = require('./gamut')
+var gamut = require('music-gamut')
 var scale = require('./scale')
 
 function mapValues (hash, fn) {

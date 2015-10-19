@@ -1,8 +1,8 @@
 'use strict'
 
 var curry = require('curry')
-var gamut = require('./gamut')
-var transpose = gamut.notes(gamut.add)
+var gamut = require('music-gamut')
+var transpose = gamut.asNotes(gamut.add)
 
 /**
  * Build a scale from a source and a tonic. A scale is an array of notes (or
@@ -25,7 +25,7 @@ var transpose = gamut.notes(gamut.add)
  */
 function scale (src, tonic) {
   var intervals = gamut.set(src)
-  return tonic ? transpose(tonic, intervals) : gamut.intervals(intervals)
+  return tonic ? transpose(tonic, intervals) : gamut.asIntervals(intervals)
 }
 
 module.exports = curry(scale)

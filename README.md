@@ -5,7 +5,7 @@
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 [![npm version](https://img.shields.io/npm/v/music-scale.svg)](https://www.npmjs.com/package/music-scale)
 [![license](https://img.shields.io/npm/l/music-scale.svg)](https://www.npmjs.com/package/music-scale)
-[![pitch-array](https://img.shields.io/badge/pitch--array-compatible-brightgreen.svg)](https://github.com/danigb/pitch-array-notation)
+[![pitch-array](https://img.shields.io/badge/pitch--array-compatible-yellow.svg)](https://github.com/danigb/pitch-array-notation)
 
 Music scales made easy:
 
