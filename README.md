@@ -147,32 +147,6 @@ Sugestions welcomed. Pull request are perfect.
 </div>
 <dl>
 <dt>
-<h4 class="name" id="fromName"><span class="type-signature"></span>fromName<span class="type-signature"></span></h4>
-</dt>
-<dd>
-<div class="description">
-<p>Build a scale using a name and a tonic</p>
-<p>It uses a dictionary of scales (see dict directory)</p>
-<p>Can be partially applied (see example)</p>
-</div>
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source"><ul class="dummy">
-<li>
-<a href="https://github.com/danigb/music-scale/blob/next/fromName.js">fromName.js</a>
-<span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/fromName.js#L5">lineno 5</a>
-</li>
-</ul></dd>
-</dl>
-<h5>Example</h5>
-<pre class="prettyprint"><code>scale.fromName('bebop locrian', 'C') // => [ 'C', 'Db', 'Eb', 'F', 'Gb', 'G', 'Ab', 'Bb' ]
-var kumoi = scale.fromName('kumoi')
-kumoi('G') // => ['G', 'A', 'Bb', 'D', 'E']</code></pre>
-</dd>
-</dl>
-<dl>
-<dt>
 <h4 class="name" id="degrees"><span class="type-signature"></span>degrees<span class="signature">(degrees, notes)</span><span class="type-signature"> &rarr; {Array}</span></h4>
 </dt>
 <dd>
@@ -216,9 +190,9 @@ null in that position.</p>
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/degrees.js">degrees.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/degrees.js">degrees.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/degrees.js#L31">lineno 31</a>
+<a href="https://github.com/danigb/music-scale/blob/master/degrees.js#L13">lineno 13</a>
 </li>
 </ul></dd>
 </dl>
@@ -278,9 +252,9 @@ a scale (array). It can be partially applied.</p>
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/dictionary.js">dictionary.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/dictionary.js">dictionary.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/dictionary.js#L31">lineno 31</a>
+<a href="https://github.com/danigb/music-scale/blob/master/dictionary.js#L14">lineno 14</a>
 </li>
 </ul></dd>
 </dl>
@@ -304,13 +278,117 @@ var minor = scales('minor')
 minor('D') // => ['D', 'E', 'F', 'G', 'A', 'Bb', 'C']</code></pre>
 </dd>
 <dt>
+<h4 class="name" id="fromName"><span class="type-signature"></span>fromName<span class="signature">(name, tonic)</span><span class="type-signature"></span></h4>
+</dt>
+<dd>
+<div class="description">
+<p>Build a scale using a name and a tonic</p>
+<p>It uses a dictionary of scales (see dict directory)</p>
+<p>Can be partially applied (see example)</p>
+</div>
+<h5>Parameters:</h5>
+<table class="params">
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th class="last">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="name"><code>name</code></td>
+<td class="type">
+<span class="param-type">String</span>
+</td>
+<td class="description last"><p>the name of the scale</p></td>
+</tr>
+<tr>
+<td class="name"><code>tonic</code></td>
+<td class="type">
+<span class="param-type">String</span>
+|
+<span class="param-type">Array</span>
+</td>
+<td class="description last"><p>the tonic of the scale</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source"><ul class="dummy">
+<li>
+<a href="https://github.com/danigb/music-scale/blob/master/fromName.js">fromName.js</a>
+<span>, </span>
+<a href="https://github.com/danigb/music-scale/blob/master/fromName.js#L5">lineno 5</a>
+</li>
+</ul></dd>
+</dl>
+<h5>Example</h5>
+<pre class="prettyprint"><code>scale.fromName('bebop locrian', 'C') // => [ 'C', 'Db', 'Eb', 'F', 'Gb', 'G', 'Ab', 'Bb' ]
+var kumoi = scale.fromName('kumoi')
+kumoi('G') // => ['G', 'A', 'Bb', 'D', 'E']</code></pre>
+</dd>
+<dt>
+<h4 class="name" id="names"><span class="type-signature"></span>names<span class="signature">(withAliases)</span><span class="type-signature"> &rarr; {Array.&lt;String>}</span></h4>
+</dt>
+<dd>
+<div class="description">
+<p>Get all scale names available</p>
+</div>
+<h5>Parameters:</h5>
+<table class="params">
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th class="last">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="name"><code>withAliases</code></td>
+<td class="type">
+<span class="param-type">Boolean</span>
+</td>
+<td class="description last"><p>set to <code>true</code> to get aliases names</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source"><ul class="dummy">
+<li>
+<a href="https://github.com/danigb/music-scale/blob/master/names.js">names.js</a>
+<span>, </span>
+<a href="https://github.com/danigb/music-scale/blob/master/names.js#L6">lineno 6</a>
+</li>
+</ul></dd>
+</dl>
+<h5>Returns:</h5>
+<div class="param-desc">
+<p>the list of all scale names</p>
+</div>
+<dl>
+<dt>
+Type
+</dt>
+<dd>
+<span class="param-type">Array.&lt;String></span>
+</dd>
+</dl>
+<h5>Example</h5>
+<pre class="prettyprint"><code>scale.names() // => ['major', 'minor', ...]</code></pre>
+</dd>
+<dt>
 <h4 class="name" id="scale"><span class="type-signature"></span>scale<span class="signature">(source, tonic)</span><span class="type-signature"> &rarr; {Array}</span></h4>
 </dt>
 <dd>
 <div class="description">
-<p>Build a scale from a source and a tonic</p>
+<p>Build a scale from a source and a tonic. A scale is an array of notes (or
+intervals if tonic is null) ordered by frequency</p>
 <p>A source can be a list of intervals or notes. The tonic must be
-a pitch (with or without octave)</p>
+a pitch (with or without octave) or null to get the scale intervals</p>
 <p>This function is currified, so you can partially apply the function passing
 one parameter instead of two (see example)</p>
 </div>
@@ -344,9 +422,9 @@ one parameter instead of two (see example)</p>
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source"><ul class="dummy">
 <li>
-<a href="https://github.com/danigb/music-scale/blob/next/scale.js">scale.js</a>
+<a href="https://github.com/danigb/music-scale/blob/master/scale.js">scale.js</a>
 <span>, </span>
-<a href="https://github.com/danigb/music-scale/blob/next/scale.js#L25">lineno 25</a>
+<a href="https://github.com/danigb/music-scale/blob/master/scale.js#L26">lineno 26</a>
 </li>
 </ul></dd>
 </dl>

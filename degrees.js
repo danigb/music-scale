@@ -17,6 +17,8 @@ function find (pitchNum, array) {
  * If a given degree is not present in the scale, the result will contain a
  * null in that position.
  *
+ * @name degrees
+ * @function
  * @param {Array|String} degrees - the degrees numbers
  * @param {Array|String} notes - the scale notes
  * @return {Array} the notes of the given degrees (or null if not present)
@@ -26,7 +28,7 @@ function find (pitchNum, array) {
  * scale.degrees('1 5 2 6', 'C D E F G A B') // => [ 'C', 'G', 'D', 'A' ]
  * scale.degrees('1 2 6', 'C D E F G') // => [ 'C', 'D', null ]
  */
-function degrees (degrees, notes) {
+module.exports = function (degrees, notes) {
   var tonic = gamut.asArray(notes)[0]
   var set = gamut.set(notes)
   var numbers = gamut.asArray(degrees).map(function (i) { return +i - 1 })
@@ -35,5 +37,3 @@ function degrees (degrees, notes) {
   })
   return transpose(tonic, selected)
 }
-
-module.exports = degrees

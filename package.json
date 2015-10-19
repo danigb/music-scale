@@ -1,13 +1,14 @@
 {
   "name": "music-scale",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Music scales made easy",
   "main": "index.js",
   "scripts": {
     "test": "vows --spec test/*.js",
     "docs": "docme README.md",
-    "dist": "browserify index.js > ./dist/music-scales.js",
-    "coverage": "istanbul cover test/tests.js"
+    "dist": "browserify index.js > ./dist/music-scale.js && browserify index.js | uglifyjs > ./dist/music-scale.min.js",
+    "coverage": "istanbul cover test/tests.js",
+    "benchmarks": "node ./test/benchmark/*.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,6 @@
   },
   "dependencies": {
     "curry": "^1.2.0",
-    "music-gamut": "^0.2.0"
+    "music-gamut": "^0.2.1"
   }
 }

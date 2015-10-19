@@ -17,6 +17,8 @@ function mapValues (hash, fn) {
  * A scale builder is a function that given a names and a tonic, returns
  * a scale (array). It can be partially applied.
  *
+ * @name dictionary
+ * @function
  * @param {Hash} data - the data (maps names to intervals or notes)
  * @param {Hash} aliases - (Optional) maps names to names in the data hash
  * @return {Function} a function to create scales
@@ -28,16 +30,14 @@ function mapValues (hash, fn) {
  * var minor = scales('minor')
  * minor('D') // => ['D', 'E', 'F', 'G', 'A', 'Bb', 'C']
  */
-function dictionary (hash, alias) {
+module.exports = function (hash, alias) {
   var data = mapValues(hash, function (src) {
     return gamut.set(src)
   })
   alias = alias || {}
 
   return curry(function (name, tonic) {
-    var intervals = data[name] || data[alias[name]] || []
+    var intervals = data[name] || data[alias[name]]
     return scale(intervals, tonic)
   })
 }
-
-module.exports = dictionary

@@ -25,5 +25,8 @@ vows.describe('scale').addBatch({
     assert.deepEqual(lydian('A'), ['A', 'B', 'C#', 'D#', 'E', 'F#', 'G#'])
     var aeolian = scale('A B C D E F G')
     assert.deepEqual(aeolian('Eb'), [ 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db' ])
+  },
+  'null scale': function () {
+    assert.deepEqual(scale(null, 'C'), [])
   }
 }).export(module)

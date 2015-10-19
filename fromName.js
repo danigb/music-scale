@@ -10,6 +10,7 @@ var dictionary = require('./dictionary')
  * Can be partially applied (see example)
  *
  * @name fromName
+ * @function
  * @param {String} name - the name of the scale
  * @param {String|Array} tonic - the tonic of the scale
  *
