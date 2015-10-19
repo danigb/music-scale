@@ -1,6 +1,6 @@
 CHANGELOG
 
-[Master]
+[next]
 
 [0.11.0]
 - The scales are now sorted by freq
@@ -19,3 +19,12 @@ CHANGELOG
 
 [0.7.0]
 - First OO version
+
+
+BENCHMARKS
+[0.11.0] build scale x 54,052 ops/sec ±0.60% (98 runs sampled)
+[0.10.0] build scale x 70,716 ops/sec ±0.50% (101 runs sampled)
+
+TAGS
+git tag 0.1.0
+git push origin master --tags

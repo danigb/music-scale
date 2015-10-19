@@ -53,7 +53,7 @@ gamut.asArray = asArray
 /**
  * Get a gamut mapped to a function
  *
- * Is important to notice that the function will receive pitches in a-pitch format.
+ * Is important to notice that the function will receive pitches in pitch-array notation format.
  *
  * This function can be partially applied
  *
@@ -75,10 +75,10 @@ gamut.map = map
 
 function asPitchArray (i) { return isArray(i) ? i : (asPitch(i) || asInterval(i)) }
 /**
- * Convert a list of notes or intervals to a-pitch format
+ * Convert a list of notes or intervals to pitch-array notation format
  *
  * @param {String|Array} source - the gamut
- * @return {Array} the gamut with notes or intervals in a-pitch format
+ * @return {Array} the gamut with notes or intervals in pitch-array notation format
  *
  * @example
  * gamut.parse('C D E') // => [ [0, 0, null], [1, 0, null], [2, 0, null] ]
@@ -140,7 +140,7 @@ gamut.pitchClass = pitchClass
 /**
  * Add interval to a gamut
  *
- * Like all the functions from gamut, this works with a-pitch format arrays.
+ * Like all the functions from gamut, this works with pitch-array notation format arrays.
  * Probably you will want to decorate this function with `gamut.notes` or
  * `gamut.intervals` (see example)
  *
